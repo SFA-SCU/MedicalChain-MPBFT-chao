@@ -9,7 +9,6 @@ import com.pancake.service.component.BlockService;
 import com.pancake.service.component.TransactionService;
 import com.pancake.service.message.impl.BlockMessageService;
 import com.pancake.socket.Blocker;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,6 @@ public class RunUtil {
     private BlockMessageService blockMsgServ = BlockMessageService.getInstance();
     private Blocker blocker = new Blocker();
 
-    @Test
     public void sendGenesisBlock() {
         String txId = "-1";
         List<String> txIdList = new ArrayList<String>();
@@ -36,7 +34,6 @@ public class RunUtil {
     /**
      * 统计各个集合中记录的数量
      */
-    @Test
     public void countRecordQuantity() {
         String ip = "127.0.0.1";
         String url;
@@ -117,7 +114,6 @@ public class RunUtil {
      *
      * @throws Exception
      */
-    @Test
     public void dropAllCollections() throws Exception {
         MongoUtil.dropAllCollections();
     }
@@ -126,7 +122,6 @@ public class RunUtil {
      * 向队列中添加 tx
      */
     @SuppressWarnings("Duplicates")
-    @Test
     public void addTxToQueue() {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_QUEUE);
         List<Transaction> txList = new ArrayList<Transaction>();
@@ -150,7 +145,6 @@ public class RunUtil {
     }
 
     @SuppressWarnings("Duplicates")
-    @Test
     public void addVerifiedTxToQueue() {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.VERIFIED_TX_QUEUE);
         try {
@@ -164,7 +158,6 @@ public class RunUtil {
     }
 
     @SuppressWarnings("Duplicates")
-    @Test
     public void addTxIdToQueue() {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_ID_QUEUE);
         try {
@@ -177,7 +170,6 @@ public class RunUtil {
         }
     }
 
-    @Test
     public void countBlocks() {
         String realIp = NetUtil.getRealIp();
         String url;
@@ -189,7 +181,6 @@ public class RunUtil {
         }
     }
 
-    @Test
     public void showBlockChain() {
         String realIp = NetUtil.getRealIp();
         String url = realIp + ":" + 8000;
