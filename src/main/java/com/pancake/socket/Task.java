@@ -1,6 +1,6 @@
 package com.pancake.socket;
 
-import com.pancake.service.component.impl.ClientService;
+import com.pancake.service.component.ClientService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,4 +1,4 @@
-package com.pancake.service.component.impl; /**
+package com.pancake.service.component; /**
  * Created by chao on 2017/11/6.
  */
 

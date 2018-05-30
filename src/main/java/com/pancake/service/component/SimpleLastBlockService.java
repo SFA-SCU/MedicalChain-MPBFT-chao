@@ -1,4 +1,4 @@
-package com.pancake.service.component.impl;
+package com.pancake.service.component;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mongodb.client.MongoCollection;

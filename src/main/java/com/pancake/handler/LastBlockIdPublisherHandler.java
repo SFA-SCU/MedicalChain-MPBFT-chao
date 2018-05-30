@@ -7,7 +7,7 @@ import com.pancake.entity.message.LastBlockIdMessage;
 import com.pancake.entity.message.Message;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
-import com.pancake.service.component.impl.NetService;
+import com.pancake.service.component.NetService;
 import com.pancake.service.message.impl.BlockMessageService;
 import com.pancake.service.message.impl.LastBlockIdMessageService;
 import com.pancake.util.NetUtil;

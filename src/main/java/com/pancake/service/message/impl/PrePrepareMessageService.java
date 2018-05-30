@@ -6,7 +6,7 @@ import com.pancake.entity.message.PrePrepareMessage;
 import com.pancake.entity.message.PrepareMessage;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
-import com.pancake.service.component.impl.NetService;
+import com.pancake.service.component.NetService;
 import com.pancake.util.MongoUtil;
 import com.pancake.util.SignatureUtil;
 import com.pancake.util.TimeUtil;

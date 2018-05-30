@@ -7,7 +7,7 @@ import com.pancake.entity.message.PrepareMessage;
 import com.pancake.entity.message.PreparedMessage;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
-import com.pancake.service.component.impl.NetService;
+import com.pancake.service.component.NetService;
 import com.pancake.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,7 +1,7 @@
 package com.pancake.socket;
 
 import com.pancake.entity.component.Transaction;
-import com.pancake.service.component.impl.TransactionService;
+import com.pancake.service.component.TransactionService;
 import com.pancake.service.message.impl.TransactionMessageService;
 
 import java.io.*;

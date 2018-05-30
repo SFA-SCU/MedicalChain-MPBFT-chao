@@ -3,7 +3,7 @@ package com.pancake.socket;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
 import com.pancake.handler.LastBlockIdPublisherHandler;
-import com.pancake.service.component.impl.BlockService;
+import com.pancake.service.component.BlockService;
 import com.pancake.util.JsonUtil;
 import com.pancake.util.NetUtil;
 import org.slf4j.Logger;

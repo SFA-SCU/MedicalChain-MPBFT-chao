@@ -1,4 +1,4 @@
-package com.pancake.service.component.impl;
+package com.pancake.service.component;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.*;

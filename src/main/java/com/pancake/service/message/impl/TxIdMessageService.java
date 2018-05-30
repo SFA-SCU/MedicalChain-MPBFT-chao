@@ -2,8 +2,8 @@ package com.pancake.service.message.impl;
 
 import com.pancake.dao.TxIdMessageDao;
 import com.pancake.entity.component.MerkleTree;
-import com.pancake.service.component.impl.TransactionService;
-import com.pancake.service.component.impl.TxIdService;
+import com.pancake.service.component.TransactionService;
+import com.pancake.service.component.TxIdService;
 import com.pancake.entity.message.TxIdMessage;
 import com.pancake.util.SignatureUtil;
 import com.pancake.util.TimeUtil;

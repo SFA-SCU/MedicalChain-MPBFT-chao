@@ -1,4 +1,4 @@
-package com.pancake.service.component.impl;
+package com.pancake.service.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.entity.util.NetAddress;

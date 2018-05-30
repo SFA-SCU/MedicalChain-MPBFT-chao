@@ -2,8 +2,8 @@ package com.pancake.service.message.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.entity.message.LastBlockIdMessage;
-import com.pancake.service.component.impl.BlockService;
-import com.pancake.service.component.impl.SimpleLastBlockService;
+import com.pancake.service.component.BlockService;
+import com.pancake.service.component.SimpleLastBlockService;
 import com.pancake.util.MongoUtil;
 import com.pancake.util.PeerUtil;
 import com.pancake.util.SignatureUtil;
