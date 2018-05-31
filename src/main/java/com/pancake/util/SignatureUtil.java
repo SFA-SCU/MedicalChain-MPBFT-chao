@@ -65,7 +65,7 @@ public class SignatureUtil {
     public static PrivateKey loadPvtKey(String algorithm) {
         PrivateKey privateKey = null;
         try {
-            String pvtKeyStr = readFile(Const.PvtKeyFile);
+            String pvtKeyStr = readFile(JsonUtil.getPvtKeyFile(Const.BlockChainConfigFile));
 
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
             PKCS8EncodedKeySpec pvtSpec = new PKCS8EncodedKeySpec(Base64.decodeBase64(pvtKeyStr));
@@ -139,7 +139,7 @@ public class SignatureUtil {
     public static String loadPubKeyStr(String algorithm) {
         String pubKeyStr= null;
         try {
-            pubKeyStr = readFile(Const.PubKeyFile);
+            pubKeyStr = readFile(JsonUtil.getPubKeyFile(Const.BlockChainConfigFile));
         } catch (Exception e) {
             e.printStackTrace();
         }

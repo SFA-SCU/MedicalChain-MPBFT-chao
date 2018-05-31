@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class NetUtil {
     private static String readIp;
-    private final static List<NetAddress> validatorList = JsonUtil.getValidatorAddressList(Const.BlockChainNodesFile);
+    private final static List<NetAddress> validatorList = JsonUtil.getValidatorAddressList(Const.BlockChainConfigFile);
     static {
         String localip = null;// 本地IP，如果没有配置外网IP则返回它
         String netip = null;// 外网IP

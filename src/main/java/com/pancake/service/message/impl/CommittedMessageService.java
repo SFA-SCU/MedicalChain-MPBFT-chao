@@ -60,7 +60,7 @@ public class CommittedMessageService {
         String cmtdMsgCollection = url + "." + Const.CMTDM;
         String lbiCollection = url + "." + Const.LAST_BLOCK_ID;
         String cliMsgType = clientMessage.getClass().getSimpleName();
-//        NetAddress publisherAddr = JsonUtil.getPublisherAddress(Const.BlockChainNodesFile);
+//        NetAddress publisherAddr = JsonUtil.getPublisherAddress(Const.BlockChainConfigFile);
         // TODO
         NetAddress blockerAddr = new NetAddress("127.0.0.1", netAddress.getPort() + 1000);
 

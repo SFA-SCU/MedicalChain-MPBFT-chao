@@ -44,7 +44,7 @@ public class ValidatorsStarter {
 
     public static void main(String[] args) {
 
-        List<NetAddress> list = JsonUtil.getValidatorAddressList(Const.BlockChainNodesFile);
+        List<NetAddress> list = JsonUtil.getValidatorAddressList(Const.BlockChainConfigFile);
         logger.info("Validator 地址 list 为：" + list);
 
         startValidators(list);

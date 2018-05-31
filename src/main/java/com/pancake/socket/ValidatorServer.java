@@ -67,7 +67,7 @@ public class ValidatorServer implements Runnable {
 
     public static void main(String[] args) {
         // 单独启动一个 Validator 服务器
-        NetAddress validatorAddr = JsonUtil.getCurrentValidator(Const.BlockChainNodesFile);
+        NetAddress validatorAddr = JsonUtil.getCurrentValidator(Const.BlockChainConfigFile);
         try {
             Thread t = new Thread(new ValidatorServer(validatorAddr));
             t.start();

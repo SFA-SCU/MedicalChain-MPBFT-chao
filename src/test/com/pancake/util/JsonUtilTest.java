@@ -9,11 +9,11 @@ public class JsonUtilTest {
 
     @Test
     public void getCurrentValidator() {
-        System.out.println(JsonUtil.getCurrentValidator(Const.BlockChainNodesFile));
+        System.out.println(JsonUtil.getCurrentValidator(Const.BlockChainConfigFile));
     }
 
     @Test
     public void getCurrentBlocker() {
-        System.out.println(JsonUtil.getCurrentBlocker(Const.BlockChainNodesFile));
+        System.out.println(JsonUtil.getCurrentBlocker(Const.BlockChainConfigFile));
     }
 }

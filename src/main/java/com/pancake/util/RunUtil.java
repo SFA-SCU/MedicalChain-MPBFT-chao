@@ -88,7 +88,7 @@ public class RunUtil {
         String txIdCollection;
         String txIdMsgCollection;
         String blockMsgCollection;
-        List<NetAddress> blockerList = JsonUtil.getBlockerAddressList(Const.BlockChainNodesFile);
+        List<NetAddress> blockerList = JsonUtil.getBlockerAddressList(Const.BlockChainConfigFile);
         for(NetAddress blockerAddr : blockerList) {
             blockChainCollection = blockerAddr + "." + Const.BLOCK_CHAIN;
             lbiCollection = blockerAddr + "." + Const.LAST_BLOCK_ID;
@@ -121,7 +121,6 @@ public class RunUtil {
     /**
      * 向队列中添加 tx
      */
-    @SuppressWarnings("Duplicates")
     public void addTxToQueue() {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_QUEUE);
         List<Transaction> txList = new ArrayList<Transaction>();
@@ -144,7 +143,6 @@ public class RunUtil {
 //        }
     }
 
-    @SuppressWarnings("Duplicates")
     public void addVerifiedTxToQueue() {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.VERIFIED_TX_QUEUE);
         try {
@@ -157,7 +155,6 @@ public class RunUtil {
         }
     }
 
-    @SuppressWarnings("Duplicates")
     public void addTxIdToQueue() {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_ID_QUEUE);
         try {

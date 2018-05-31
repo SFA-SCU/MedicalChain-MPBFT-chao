@@ -1,6 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
-.idea/
+.idea
 MedicalChainNode.iml
 privateKey.txt
 publicKey.txt
-target/
+target
+log
+classes

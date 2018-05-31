@@ -154,6 +154,30 @@ public class JsonUtil {
     }
 
     /**
+     * 获取私钥所在文件
+     * @param jsonFile
+     * @return
+     */
+    public static String getPvtKeyFile(String jsonFile) {
+        String jsonStr = getStrByJsonFile(jsonFile);
+        Map map = jsonToMap(jsonStr);
+        Map pubMap = (HashMap) map.get("key_pair");
+        return (String)pubMap.get("pvt_key_file");
+    }
+
+    /**
+     * 获取公钥所在文件
+     * @param jsonFile
+     * @return
+     */
+    public static String getPubKeyFile(String jsonFile) {
+        String jsonStr = getStrByJsonFile(jsonFile);
+        Map map = jsonToMap(jsonStr);
+        Map pubMap = (HashMap) map.get("key_pair");
+        return (String)pubMap.get("pub_key_file");
+    }
+
+    /**
      * 获取 Publisher 的地址
      * @param jsonFile
      * @return
@@ -216,7 +240,7 @@ public class JsonUtil {
 
 
     public static void main(String[] args) {
-        String jsonFile = Const.BlockChainNodesFile;
+        String jsonFile = Const.BlockChainConfigFile;
 
         // 1. 从指定路径读取json文件，解析后返回json字符串
         logger.info(getStrByJsonFile(jsonFile));

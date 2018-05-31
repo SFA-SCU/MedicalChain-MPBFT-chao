@@ -27,7 +27,7 @@ public class RabbitmqUtil {
 
     static {
 
-        RabbitmqServer rabbitmqServer = JsonUtil.getRabbitmqServer(Const.BlockChainNodesFile);
+        RabbitmqServer rabbitmqServer = JsonUtil.getRabbitmqServer(Const.BlockChainConfigFile);
         if(rabbitmqServer != null) {
             factory.setUsername(rabbitmqServer.getUserName());
             factory.setPassword(rabbitmqServer.getPassword());

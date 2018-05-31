@@ -40,7 +40,7 @@ public class BlockersStarter {
     }
 
     public static void main(String[] args) {
-        List<NetAddress> blockerList = JsonUtil.getBlockerAddressList(Const.BlockChainNodesFile);
+        List<NetAddress> blockerList = JsonUtil.getBlockerAddressList(Const.BlockChainConfigFile);
         logger.info("Blocker 地址 list 为：" + blockerList);
         startBlockerServers(blockerList);
     }

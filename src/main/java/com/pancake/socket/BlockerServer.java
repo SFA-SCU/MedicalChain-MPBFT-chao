@@ -59,7 +59,7 @@ public class BlockerServer implements Runnable {
 
     }
     public static void main(String[] args) {
-        NetAddress netAddr = JsonUtil.getCurrentBlocker(Const.BlockChainNodesFile);
+        NetAddress netAddr = JsonUtil.getCurrentBlocker(Const.BlockChainConfigFile);
         start(netAddr);
 
     }

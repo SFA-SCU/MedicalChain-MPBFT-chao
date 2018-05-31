@@ -4,11 +4,11 @@ package com.pancake.entity.util;
  * Created by chao on 2017/11/9.
  */
 public class Const {
-    public final static String BlockChainNodesFile =
-            "src/main/resources/blockchain-nodes.json";
+    public static String BlockChainConfigFile =
+            "src/main/resources/blockchain-config.json";
 
-    public final static String PvtKeyFile = "C:\\Users\\chao\\medical_chain\\privateKey.txt";
-    public final static String PubKeyFile = "C:\\Users\\chao\\medical_chain\\publicKey.txt";
+    public static String PvtKeyFile = "C:\\Users\\chao\\medical_chain\\privateKey.txt";
+    public static String PubKeyFile = "C:\\Users\\chao\\medical_chain\\publicKey.txt";
 
     public final static String CM = "ClientMsg";
     public final static String PPM = "PrePrepareMsg";

@@ -11,7 +11,7 @@ import java.util.List;
  * Created by chao on 2017/11/30.
  */
 public class PeerUtil {
-    private static List<NetAddress> list = JsonUtil.getValidatorAddressList(Const.BlockChainNodesFile);
+    private static List<NetAddress> list = JsonUtil.getValidatorAddressList(Const.BlockChainConfigFile);
     private static int peerCount = 0;
     private static int faultCount = 0;
 

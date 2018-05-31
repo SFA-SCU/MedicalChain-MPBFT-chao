@@ -17,13 +17,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ClientFrontEnd {
 
     /**
-     * 根据 BlockChainNodesFile 连接验证器
+     * 根据 BlockChainConfigFile 连接验证器
      */
     public static void connValidators() {
 
         ThreadPoolExecutor es = (ThreadPoolExecutor) Executors.
                 newCachedThreadPool();
-        List<NetAddress> list = JsonUtil.getValidatorAddressList(Const.BlockChainNodesFile);
+        List<NetAddress> list = JsonUtil.getValidatorAddressList(Const.BlockChainConfigFile);
         NetAddress va = null;
         for(int index=0; index < list.size(); index++) {
             va = list.get(index);

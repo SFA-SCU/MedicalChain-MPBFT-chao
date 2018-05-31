@@ -31,7 +31,7 @@ public class LastBlockIdPublisher implements Runnable {
     }
 
     public void run() {
-//        NetAddress na = JsonUtil.getPublisherAddress(Const.BlockChainNodesFile);
+//        NetAddress na = JsonUtil.getPublisherAddress(Const.BlockChainConfigFile);
 //        NettyServer publisherServer = new NettyServer(na.getPort(), new PublisherHandler());
 //        try {
 //            logger.info("启动 PreBlockPublisher 服务器");
@@ -57,7 +57,7 @@ public class LastBlockIdPublisher implements Runnable {
 
     public static void main(String[] args) {
         int availableProcessors = Runtime.getRuntime().availableProcessors();
-        NetAddress na = JsonUtil.getPublisherAddress(Const.BlockChainNodesFile);
+        NetAddress na = JsonUtil.getPublisherAddress(Const.BlockChainConfigFile);
         try {
             new Thread(new LastBlockIdPublisher(na.getPort(), availableProcessors)).start();
         } catch (IOException e) {

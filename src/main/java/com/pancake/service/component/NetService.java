@@ -41,9 +41,9 @@ public class NetService {
      * @throws IOException
      */
     public static void broadcastMsg(String ip, int localPort, String msg) throws IOException {
-        List<NetAddress> list = JsonUtil.getValidatorAddressList(Const.BlockChainNodesFile);
+        List<NetAddress> list = JsonUtil.getValidatorAddressList(Const.BlockChainConfigFile);
         for (NetAddress va : list) {
-            // 排除本机，向 BlockChainNodesFile 中存储的其他节点发送预准备消息
+            // 排除本机，向 BlockChainConfigFile 中存储的其他节点发送预准备消息
             if (!((va.getIp().equals(ip) || va.getIp().equals("127.0.0.1")) && va.getPort() == localPort)) {
                 Socket broadcastSocket = new Socket(va.getIp(), va.getPort());
                 OutputStream outToServer = broadcastSocket.getOutputStream();

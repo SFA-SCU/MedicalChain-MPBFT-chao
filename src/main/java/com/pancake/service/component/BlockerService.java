@@ -27,7 +27,7 @@ public class BlockerService {
      * @return
      */
     public boolean isCurrentBlocker(NetAddress blockerAddr, long blockLength){
-        List<NetAddress> list = JsonUtil.getBlockerAddressList(Const.BlockChainNodesFile);
+        List<NetAddress> list = JsonUtil.getBlockerAddressList(Const.BlockChainConfigFile);
         int len = list.size();
 
         //若是主节点，则返回null
