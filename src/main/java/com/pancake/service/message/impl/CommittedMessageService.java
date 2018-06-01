@@ -62,7 +62,7 @@ public class CommittedMessageService {
         String cliMsgType = clientMessage.getClass().getSimpleName();
 //        NetAddress publisherAddr = JsonUtil.getPublisherAddress(Const.BlockChainConfigFile);
         // TODO
-        NetAddress blockerAddr = new NetAddress("127.0.0.1", netAddress.getPort() + 1000);
+        NetAddress blockerAddr = JsonUtil.getCurrentBlocker(Const.BlockChainConfigFile);
 
         if (this.save(cmtdMsg, cmtdMsgCollection)) {
             logger.info("将 CommittedMessage [" + cmtdMsg.toString() + "] 存入数据库");

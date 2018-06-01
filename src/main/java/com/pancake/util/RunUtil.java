@@ -23,6 +23,11 @@ public class RunUtil {
     private BlockMessageService blockMsgServ = BlockMessageService.getInstance();
     private Blocker blocker = new Blocker();
 
+    public static void main(String[] args) {
+        RunUtil runUtil = new RunUtil();
+        runUtil.countRecordQuantity();
+    }
+
     public void sendGenesisBlock() {
         String txId = "-1";
         List<String> txIdList = new ArrayList<String>();
@@ -35,7 +40,6 @@ public class RunUtil {
      * 统计各个集合中记录的数量
      */
     public void countRecordQuantity() {
-        String ip = "127.0.0.1";
         String url;
         String ppmCollection;
         String pmCollection;
@@ -45,9 +49,13 @@ public class RunUtil {
         String blockChainCollection;
         String txCollection;
 
+        List<NetAddress> netAddresses = JsonUtil.getValidatorAddressList(Const.BlockChainConfigFile);
+        MongoDB mongoDB;
+
         // 1. 检索 Validator 上的所有集合
-        for (int port = 8000; port < 8004; port++) {
-            url = ip + ":" + port;
+        for (NetAddress na : netAddresses) {
+            url = na.toString();
+            mongoDB = new MongoDB(new NetAddress(na.getIp(), 27017), Const.BLOCK_CHAIN);
             ppmCollection = url + "." + Const.PPM;
             pmCollection = url + "." + Const.PM;
             pdmCollection = url + "." + Const.PDM;
@@ -56,18 +64,19 @@ public class RunUtil {
             blockChainCollection = url + "." + Const.BLOCK_CHAIN;
             txCollection = url + "." + Const.TX;
             String lbiCollection = url + "." + Const.LAST_BLOCK_ID;
-            String txIdCollectorColl = "TxIdCollector" + ip + ":" + (port + 1000) + ".TxIds";
+            String txIdCollectorColl = "TxIdCollector" + na.getIp() + ":" + (na.getPort() + 1000) + ".TxIds";
 
-            long ppmCount = MongoUtil.countRecords(ppmCollection);
-            long pmCount = MongoUtil.countRecords(pmCollection);
-            long pdmCount = MongoUtil.countRecords(pdmCollection);
-            long cmtmCount = MongoUtil.countRecords(cmtmCollection);
-            long cmtdmCount = MongoUtil.countRecords(cmtdmCollection);
-            long blockChainCount = MongoUtil.countRecords(blockChainCollection);
-            long txCount = MongoUtil.countRecords(txCollection);
-            int blockIdCount = MongoUtil.countValuesByKey("blockId", blockChainCollection);
-            long txIdsCount = MongoUtil.countRecords(txIdCollectorColl);
-            String lastBlockId = blockService.getLastBlockId(lbiCollection);
+            long ppmCount = mongoDB.countRecords(ppmCollection);
+            long pmCount = mongoDB.countRecords(pmCollection);
+            long pdmCount = mongoDB.countRecords(pdmCollection);
+            long cmtmCount = mongoDB.countRecords(cmtmCollection);
+            long cmtdmCount = mongoDB.countRecords(cmtdmCollection);
+            long blockChainCount = mongoDB.countRecords(blockChainCollection);
+            long txCount = mongoDB.countRecords(txCollection);
+            int blockIdCount = mongoDB.countValuesByKey("blockId", blockChainCollection);
+            long txIdsCount = mongoDB.countRecords(txIdCollectorColl);
+//            String lastBlockId = blockService.getLastBlockId(lbiCollection);
+            String lastBlockId = "test";
 
             System.out.println("主机 [ " + url + " ] < ppmCount: " + ppmCount
                     + ", pmCount: " + pmCount
@@ -90,17 +99,19 @@ public class RunUtil {
         String blockMsgCollection;
         List<NetAddress> blockerList = JsonUtil.getBlockerAddressList(Const.BlockChainConfigFile);
         for(NetAddress blockerAddr : blockerList) {
+            mongoDB = new MongoDB(new NetAddress(blockerAddr.getIp(), 27017), Const.BLOCK_CHAIN);
             blockChainCollection = blockerAddr + "." + Const.BLOCK_CHAIN;
             lbiCollection = blockerAddr + "." + Const.LAST_BLOCK_ID;
             txIdCollection = blockerAddr + "." + Const.TX_ID;
             txIdMsgCollection = blockerAddr + "." + Const.TIM;
             blockMsgCollection = blockerAddr + "." + Const.BM;
 
-            long blockChainCount = MongoUtil.countRecords(blockChainCollection);
-            long blockMsgCount = MongoUtil.countRecords(blockMsgCollection);
-            String lastBlockId = blockService.getLastBlockId(lbiCollection);
-            long txIdsCount = MongoUtil.countRecords(txIdCollection);
-            long txIdMsgCount = MongoUtil.countRecords(txIdMsgCollection);
+            long blockChainCount = mongoDB.countRecords(blockChainCollection);
+            long blockMsgCount = mongoDB.countRecords(blockMsgCollection);
+//            String lastBlockId = blockService.getLastBlockId(lbiCollection);
+            String lastBlockId = "test";
+            long txIdsCount = mongoDB.countRecords(txIdCollection);
+            long txIdMsgCount = mongoDB.countRecords(txIdMsgCollection);
             System.out.println("主机 [ " + blockerAddr + " ] <  blockChainCount: " + blockChainCount
                     + ", blockMsgCount: " + blockMsgCount
                     + ", txIdsCount: " + txIdsCount
