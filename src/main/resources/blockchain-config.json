@@ -52,7 +52,7 @@
     "port":5672
   },
   "key_pair": {
-    "pvt_key_file": "privateKey.txt",
-    "pub_key_file": "publicKey.txt"
+    "pvt_key_file": "src/main/resources/privateKey.txt",
+    "pub_key_file": "src/main/resources/publicKey.txt"
   }
 }

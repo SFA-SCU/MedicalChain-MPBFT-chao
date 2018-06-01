@@ -148,16 +148,54 @@ public class BlockService {
     }
 
     /**
+     * 创建并初始化 Last Block Id
+     * @param collectionName
+     */
+    public void initLastBlockIdColl(MongoDB mongoDB, String collectionName) {
+        if (!mongoDB.collectionExists(collectionName)) {
+            logger.debug("集合" + collectionName + "不存在，开始创建");
+            mongoDB.insertKV(Const.LAST_BLOCK_ID, Const.GENESIS_BLOCK_ID, collectionName);
+        }
+    }
+
+    /**
      * 从 collectionName 中获取 LastBlockId
      * @param collectionName
      * @return
      */
     public String getLastBlockId(String collectionName){
         if (!MongoUtil.collectionExists(collectionName)) {
-            initLastBlockIdColl(collectionName);
+            this.initLastBlockIdColl(collectionName);
             return Const.GENESIS_BLOCK_ID;
         } else {
             String record = MongoUtil.findFirstDoc(collectionName);
+            if (record != null && !record.equals("")) {
+                try {
+                    return (String) objectMapper.readValue(record, Map.class).get(Const.LAST_BLOCK_ID);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                logger.error("LastBlockId record 反序列化失败！");
+                return null;
+
+            } else {
+                logger.error("获取 LastBlockId 失败！");
+                return null;
+            }
+        }
+    }
+
+    /**
+     * 从 collectionName 中获取 LastBlockId
+     * @param collectionName
+     * @return
+     */
+    public String getLastBlockId(MongoDB mongoDB, String collectionName){
+        if (!mongoDB.collectionExists(collectionName)) {
+            this.initLastBlockIdColl(collectionName);
+            return Const.GENESIS_BLOCK_ID;
+        } else {
+            String record = mongoDB.findFirstDoc(collectionName);
             if (record != null && !record.equals("")) {
                 try {
                     return (String) objectMapper.readValue(record, Map.class).get(Const.LAST_BLOCK_ID);

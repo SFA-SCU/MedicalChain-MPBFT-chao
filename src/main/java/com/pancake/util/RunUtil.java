@@ -25,7 +25,9 @@ public class RunUtil {
 
     public static void main(String[] args) {
         RunUtil runUtil = new RunUtil();
+//        runUtil.addTxToQueue();
         runUtil.countRecordQuantity();
+//        runUtil.sendGenesisBlock();
     }
 
     public void sendGenesisBlock() {
@@ -48,6 +50,7 @@ public class RunUtil {
         String cmtdmCollection;
         String blockChainCollection;
         String txCollection;
+        List<String> result = new ArrayList<String>();
 
         List<NetAddress> netAddresses = JsonUtil.getValidatorAddressList(Const.BlockChainConfigFile);
         MongoDB mongoDB;
@@ -75,10 +78,9 @@ public class RunUtil {
             long txCount = mongoDB.countRecords(txCollection);
             int blockIdCount = mongoDB.countValuesByKey("blockId", blockChainCollection);
             long txIdsCount = mongoDB.countRecords(txIdCollectorColl);
-//            String lastBlockId = blockService.getLastBlockId(lbiCollection);
-            String lastBlockId = "test";
+            String lastBlockId = blockService.getLastBlockId(mongoDB, lbiCollection);
 
-            System.out.println("主机 [ " + url + " ] < ppmCount: " + ppmCount
+            result.add("主机 [ " + url + " ] < ppmCount: " + ppmCount
                     + ", pmCount: " + pmCount
                     + ", pdmCount: " + pdmCount
                     + ", cmtmCount: " + cmtmCount
@@ -90,7 +92,7 @@ public class RunUtil {
                     + ", lastBlockId: " + lastBlockId);
         }
 
-        System.out.println("=================================================================================");
+        result.add("=================================================================================");
 
         // 2. 检索 blocker 上的所有集合
         String lbiCollection;
@@ -108,15 +110,18 @@ public class RunUtil {
 
             long blockChainCount = mongoDB.countRecords(blockChainCollection);
             long blockMsgCount = mongoDB.countRecords(blockMsgCollection);
-//            String lastBlockId = blockService.getLastBlockId(lbiCollection);
-            String lastBlockId = "test";
+            String lastBlockId = blockService.getLastBlockId(mongoDB, lbiCollection);
             long txIdsCount = mongoDB.countRecords(txIdCollection);
             long txIdMsgCount = mongoDB.countRecords(txIdMsgCollection);
-            System.out.println("主机 [ " + blockerAddr + " ] <  blockChainCount: " + blockChainCount
+            result.add("主机 [ " + blockerAddr + " ] <  blockChainCount: " + blockChainCount
                     + ", blockMsgCount: " + blockMsgCount
                     + ", txIdsCount: " + txIdsCount
                     + ", txIdMsgCount: " + txIdMsgCount
                     + ", lastBlockId: " + lastBlockId);
+        }
+
+        for (String res : result) {
+            System.out.println(res);
         }
     }
 
@@ -136,7 +141,7 @@ public class RunUtil {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_QUEUE);
         List<Transaction> txList = new ArrayList<Transaction>();
         try {
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 1000; i++) {
                 Transaction tx = TransactionService.genTx("string" + i, "测试" + i);
 //                if(i<4) {
 //                    txList.add(tx);

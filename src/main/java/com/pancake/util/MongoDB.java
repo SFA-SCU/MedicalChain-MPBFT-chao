@@ -6,11 +6,13 @@ import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,7 +25,18 @@ public class MongoDB {
     private MongoDatabase mongoDatabase;
 
     public MongoDB() {
-
+        mongoClient = new MongoClient("localhost", 27017);
+        MongoClientOptions.Builder options = new MongoClientOptions.Builder();
+        // options.autoConnectRetry(true);// 自动重连true
+        // options.maxAutoConnectRetryTime(10); // the maximum auto connect retry time
+        options.connectionsPerHost(300);// 连接池设置为300个连接,默认为100
+        options.connectTimeout(15000);// 连接超时，推荐>3000毫秒
+        options.maxWaitTime(5000); //
+        options.socketTimeout(0);// 套接字超时时间，0无限制
+        options.threadsAllowedToBlockForConnectionMultiplier(5000);// 线程队列数，如果连接线程排满了队列就会抛出“Out of semaphores to get db”错误。
+        options.writeConcern(WriteConcern.ACKNOWLEDGED);//
+        options.build();
+        mongoDatabase = mongoClient.getDatabase(Const.BLOCK_CHAIN);
     }
 
     public MongoDB(String database) {
@@ -94,6 +107,42 @@ public class MongoDB {
      */
     public int countValuesByKey(String key, String collectionName) {
         return this.findValuesByKey(key, collectionName).size();
+    }
+
+    /**
+     * 判断 collectionName 是否存在
+     *
+     * @param collectionName
+     * @return
+     */
+    public boolean collectionExists(String collectionName) {
+        return mongoDatabase.listCollectionNames()
+                .into(new ArrayList<String>()).contains(collectionName);
+    }
+
+    /**
+     * 查找集合 collectionName 中的第一条记录，以 json 形式返回
+     *
+     * @param collectionName
+     * @return
+     */
+    public String findFirstDoc(String collectionName) {
+        MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+        Document document = collection.find().first();
+        return document.toJson();
+    }
+
+    /**
+     * 插入key-value
+     *
+     * @param key
+     * @param value
+     * @param collectionName
+     */
+    public void insertKV(String key, String value, String collectionName) {
+        MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+        Document document = new Document(key, value);
+        collection.insertOne(document);
     }
 
 }
