@@ -3,20 +3,21 @@ package com.pancake.entity.pojo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class RabbitmqServer {
-    private String userName;
-    private String password;
+/**
+ * Created by chao on 2018/6/2.
+ */
+public class MongoDBConfig {
     private String ip;
     private int port;
+    private String database;
 
-    public RabbitmqServer() {
+    public MongoDBConfig() {
     }
 
-    public RabbitmqServer(String userName, String password, String ip, int port) {
-        this.userName = userName;
-        this.password = password;
+    public MongoDBConfig(String ip, int port, String database) {
         this.ip = ip;
         this.port = port;
+        this.database = database;
     }
 
     @Override
@@ -28,22 +29,6 @@ public class RabbitmqServer {
             e.printStackTrace();
         }
         return rtn;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getIp() {
@@ -60,5 +45,13 @@ public class RabbitmqServer {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public String getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(String database) {
+        this.database = database;
     }
 }

@@ -6,6 +6,7 @@ import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.pancake.entity.pojo.MongoDBConfig;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
 import org.bson.Document;
@@ -21,11 +22,12 @@ import java.util.Set;
  */
 public class MongoDB {
     private final static Logger logger = LoggerFactory.getLogger(MongoDB.class);
-    private MongoClient mongoClient;
     private MongoDatabase mongoDatabase;
+    private MongoDBConfig mongoDBConfig = JsonUtil.getMongoDBConfig(Const.BlockChainConfigFile);
+    private MongoClient mongoClient = new MongoClient(mongoDBConfig.getIp(), mongoDBConfig.getPort());
+    private String database = mongoDBConfig.getDatabase();
 
     public MongoDB() {
-        mongoClient = new MongoClient("localhost", 27017);
         MongoClientOptions.Builder options = new MongoClientOptions.Builder();
         // options.autoConnectRetry(true);// 自动重连true
         // options.maxAutoConnectRetryTime(10); // the maximum auto connect retry time
@@ -36,11 +38,11 @@ public class MongoDB {
         options.threadsAllowedToBlockForConnectionMultiplier(5000);// 线程队列数，如果连接线程排满了队列就会抛出“Out of semaphores to get db”错误。
         options.writeConcern(WriteConcern.ACKNOWLEDGED);//
         options.build();
-        mongoDatabase = mongoClient.getDatabase(Const.BLOCK_CHAIN);
+        mongoDatabase = mongoClient.getDatabase(database);
     }
 
     public MongoDB(String database) {
-        mongoClient = new MongoClient("localhost", 27017);
+        this.database = database;
         MongoClientOptions.Builder options = new MongoClientOptions.Builder();
         // options.autoConnectRetry(true);// 自动重连true
         // options.maxAutoConnectRetryTime(10); // the maximum auto connect retry time
@@ -55,6 +57,7 @@ public class MongoDB {
     }
 
     public MongoDB(NetAddress mongoAddr, String database) {
+        this.database = database;
         mongoClient = new MongoClient(mongoAddr.getIp(), mongoAddr.getPort());
         MongoClientOptions.Builder options = new MongoClientOptions.Builder();
         // options.autoConnectRetry(true);// 自动重连true

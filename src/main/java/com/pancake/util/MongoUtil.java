@@ -7,6 +7,7 @@ import com.mongodb.client.model.*;
 import com.mongodb.client.result.UpdateResult;
 import com.pancake.entity.component.TxId;
 import com.pancake.entity.message.*;
+import com.pancake.entity.pojo.MongoDBConfig;
 import com.pancake.entity.util.Const;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -26,10 +27,11 @@ import static com.mongodb.client.model.Sorts.descending;
 public class MongoUtil {
     private final static Logger logger = LoggerFactory.getLogger(MongoUtil.class);
     private final static ObjectMapper objectMapper = new ObjectMapper();
-    private static MongoClient mongoClient = new MongoClient("localhost", 27017);
     private static MongoDatabase mongoDatabase;
 
     static {
+        MongoDBConfig mongoDBConfig = JsonUtil.getMongoDBConfig(Const.BlockChainConfigFile);
+        MongoClient mongoClient = new MongoClient(mongoDBConfig.getIp(), mongoDBConfig.getPort());
         MongoClientOptions.Builder options = new MongoClientOptions.Builder();
         // options.autoConnectRetry(true);// 自动重连true
         // options.maxAutoConnectRetryTime(10); // the maximum auto connect retry time
@@ -40,7 +42,7 @@ public class MongoUtil {
         options.threadsAllowedToBlockForConnectionMultiplier(5000);// 线程队列数，如果连接线程排满了队列就会抛出“Out of semaphores to get db”错误。
         options.writeConcern(WriteConcern.ACKNOWLEDGED);//
         options.build();
-        mongoDatabase = mongoClient.getDatabase("BlockChain");
+        mongoDatabase = mongoClient.getDatabase(mongoDBConfig.getDatabase());
     }
 
     /**

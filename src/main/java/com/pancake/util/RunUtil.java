@@ -59,7 +59,7 @@ public class RunUtil {
         // 1. 检索 Validator 上的所有集合
         for (NetAddress na : netAddresses) {
             url = na.toString();
-            mongoDB = new MongoDB(new NetAddress(na.getIp(), 27017), Const.BLOCK_CHAIN);
+            mongoDB = new MongoDB(new NetAddress("127.0.0.1", 27017), Const.BLOCK_CHAIN);
             ppmCollection = url + "." + Const.PPM;
             pmCollection = url + "." + Const.PM;
             pdmCollection = url + "." + Const.PDM;
@@ -102,7 +102,7 @@ public class RunUtil {
         String blockMsgCollection;
         List<NetAddress> blockerList = JsonUtil.getBlockerAddressList(Const.BlockChainConfigFile);
         for(NetAddress blockerAddr : blockerList) {
-            mongoDB = new MongoDB(new NetAddress(blockerAddr.getIp(), 27017), Const.BLOCK_CHAIN);
+            mongoDB = new MongoDB(new NetAddress("127.0.0.1", 27017), Const.BLOCK_CHAIN);
             blockChainCollection = blockerAddr + "." + Const.BLOCK_CHAIN;
             lbiCollection = blockerAddr + "." + Const.LAST_BLOCK_ID;
             txIdCollection = blockerAddr + "." + Const.TX_ID;

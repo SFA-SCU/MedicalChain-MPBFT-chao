@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pancake.entity.pojo.MongoDBConfig;
 import com.pancake.entity.pojo.RabbitmqServer;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
@@ -151,6 +152,18 @@ public class JsonUtil {
         Map pubMap = (HashMap) map.get("rabbitmq");
         return new RabbitmqServer((String)pubMap.get("userName"), (String)pubMap.get("password"), (String)pubMap.get("ip"),
                 (Integer) pubMap.get("port"));
+    }
+
+    /**
+     * 从 jsonFile 中获取 mongodb 的配置信息
+     * @param jsonFile
+     * @return
+     */
+    public static MongoDBConfig getMongoDBConfig(String jsonFile) {
+        String jsonStr = getStrByJsonFile(jsonFile);
+        Map map = jsonToMap(jsonStr);
+        Map pubMap = (HashMap) map.get("mongodb");
+        return new MongoDBConfig((String)pubMap.get("ip"), (Integer) pubMap.get("port"), (String)pubMap.get("database"));
     }
 
     /**
