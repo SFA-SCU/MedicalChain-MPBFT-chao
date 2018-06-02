@@ -96,7 +96,7 @@ public class CommittedMessageService {
                     List<String> txIdList = txService.getTxIdList(txList);
                     logger.info("交易 :" + txIdList + " 存入成功");
 
-                    // 验证成功的 tx 发送到 TxIdCollector 服务器上
+                    // 验证成功的 tx 发送到 blocker 服务器上
                     TxIdMessage txIdMsg = timSrv.genInstance(txIdList, netAddress.getIp(), netAddress.getPort());
                     netService.sendMsg(txIdMsg.toString(), blockerAddr.getIp(), blockerAddr.getPort());
                 }

@@ -3,6 +3,7 @@ package com.pancake.entity.component;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pancake.entity.content.TxContent;
 
 /**
  * Created by chao on 2017/11/11.
@@ -11,15 +12,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Transaction {
     private String txId;
     private String signature;  //客户端给该交易单的签名, 为string类型
-    private String txType; //txType 用以标志当前 Transaction 对象所存储的数据的类型，如 Patient、Doctor、Record等
+    private String txType; //txType 用以标志当前 Transaction 所要进行的操作
     private String pubKey;  // 客户端该交易单签名的客户端的私钥所对应的公钥, 为string类型
-    private String content;  // 该交易单实际存储的内容
+    private TxContent content;  // 该交易单实际存储的内容
     private String timestamp;  // 交易单生成时的时间
 
     public Transaction() {
     }
 
-    public Transaction(String txId, String signature, String txType, String pubKey, String content, String timestamp) {
+    public Transaction(String txId, String signature, String txType, String pubKey, TxContent content, String timestamp) {
         this.txId = txId;
         this.signature = signature;
         this.txType = txType;
@@ -71,11 +72,11 @@ public class Transaction {
         this.pubKey = pubKey;
     }
 
-    public String getContent() {
+    public TxContent getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(TxContent content) {
         this.content = content;
     }
 

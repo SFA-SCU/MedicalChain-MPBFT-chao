@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.dao.BlockDao;
 import com.pancake.entity.component.Block;
 import com.pancake.entity.component.MerkleTree;
+import com.pancake.entity.content.TxString;
+import com.pancake.entity.enumeration.TxType;
 import com.pancake.entity.util.Const;
 import com.pancake.util.*;
 import org.slf4j.Logger;
@@ -253,7 +255,7 @@ public class BlockService {
         List<String> txIdList = new ArrayList<String>();
         for (int i = 0; i < 10; i++) {
             try {
-                txIdList.add(txService.genTx("string", "测试" + i).getTxId());
+                txIdList.add(txService.genTx(TxType.INSERT.getName(), new TxString("测试" + i)).getTxId());
             } catch (Exception e) {
                 e.printStackTrace();
             }

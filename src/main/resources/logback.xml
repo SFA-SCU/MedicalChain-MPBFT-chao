@@ -16,6 +16,11 @@
             <onMismatch>DENY</onMismatch>
         </filter>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
@@ -102,11 +107,29 @@
         </filter>
     </appender>
 
+    <appender name="STDOUT_DEBUG" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>
+                <!-- %replace: 字符串替换; %caller: 方法调用栈. -->
+                <!-- (\bCaller.+?(?=\()): 正则, 匹配字符串"Caller...(",不含(号 -->
+                %date{yyyy-MM-dd HH:mm:ss} | %highlight(%-5level) | %boldYellow(%thread) | %boldGreen(%logger) | %replace(%caller{1}){'(\bCaller.+?(?=\())|\r|\n|\s*|\t', ''} | %msg%n
+            </Pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
     <root level="DEBUG">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="DEBUG" />
         <appender-ref ref="ERROR" />
         <appender-ref ref="WARN" />
         <appender-ref ref="STDOUT_ERROR" />
+        <!-- <appender-ref ref="STDOUT_DEBUG" /> -->
     </root>
 </configuration>

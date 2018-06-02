@@ -1,6 +1,8 @@
 package com.pancake.socket;
 
 import com.pancake.entity.component.Transaction;
+import com.pancake.entity.content.TxString;
+import com.pancake.entity.enumeration.TxType;
 import com.pancake.service.component.TransactionService;
 import com.pancake.service.message.impl.TransactionMessageService;
 
@@ -29,7 +31,7 @@ public class Client {
             OutputStream outToServer = client.getOutputStream();
             DataOutputStream out = new DataOutputStream(outToServer);
             List<Transaction> txList = new ArrayList<Transaction>();
-            txList.add(TransactionService.genTx("string", "测试"));
+            txList.add(TransactionService.genTx(TxType.INSERT.getName(), new TxString("测试")));
             String txMsg = txMsgService.genInstance(txList).toString();
             out.writeUTF(txMsg);
 

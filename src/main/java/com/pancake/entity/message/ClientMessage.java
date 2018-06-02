@@ -9,8 +9,9 @@ import com.pancake.entity.util.Const;
  */
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "msgType")
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "msgType",
+        visible = true)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = BlockMessage.class, name = Const.BM),
         @JsonSubTypes.Type(value = TransactionMessage.class, name = Const.TXM)})

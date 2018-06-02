@@ -3,8 +3,6 @@ package com.pancake.entity.message;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.entity.util.Const;
 
 /**
@@ -13,8 +11,9 @@ import com.pancake.entity.util.Const;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "msgType")
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "msgType",
+        visible = true)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = PrePrepareMessage.class, name = Const.PPM),
         @JsonSubTypes.Type(value = PrepareMessage.class, name = Const.PM),
@@ -42,16 +41,16 @@ public class Message {
         this.signature = signature;
     }
 
-    @Override
-    public String toString() {
-        String rtn = null;
-        try {
-            rtn = (new ObjectMapper()).writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return rtn;
-    }
+//    @Override
+//    public String toString() {
+//        String rtn = null;
+//        try {
+//            rtn = (new ObjectMapper()).writeValueAsString(this);
+//        } catch (JsonProcessingException e) {
+//            e.printStackTrace();
+//        }
+//        return rtn;
+//    }
 
     public String getMsgId() {
         return msgId;

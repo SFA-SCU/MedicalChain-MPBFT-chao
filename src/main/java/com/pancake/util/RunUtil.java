@@ -3,12 +3,16 @@ package com.pancake.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.entity.component.Block;
 import com.pancake.entity.component.Transaction;
+import com.pancake.entity.content.TxString;
+import com.pancake.entity.enumeration.TxType;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
 import com.pancake.service.component.BlockService;
 import com.pancake.service.component.TransactionService;
 import com.pancake.service.message.impl.BlockMessageService;
 import com.pancake.socket.Blocker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +24,7 @@ import java.util.List;
 
 public class RunUtil {
     private final static ObjectMapper objMapper = new ObjectMapper();
+    private final static Logger logger = LoggerFactory.getLogger(RunUtil.class);
     private BlockService blockService = BlockService.getInstance();
     private BlockMessageService blockMsgServ = BlockMessageService.getInstance();
     private Blocker blocker = new Blocker();
@@ -142,8 +147,8 @@ public class RunUtil {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_QUEUE);
         List<Transaction> txList = new ArrayList<Transaction>();
         try {
-            for (int i = 0; i < 1000; i++) {
-                Transaction tx = TransactionService.genTx("string" + i, "测试" + i);
+            for (int i = 0; i < 100; i++) {
+                Transaction tx = TransactionService.genTx(TxType.INSERT.getName(), new TxString("测试" + i));
 //                if(i<4) {
 //                    txList.add(tx);
 //                }
@@ -164,7 +169,7 @@ public class RunUtil {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.VERIFIED_TX_QUEUE);
         try {
             for (int i = 0; i < 50; i++) {
-                Transaction tx = TransactionService.genTx("string" + i, "测试" + i);
+                Transaction tx = TransactionService.genTx(TxType.INSERT.getName(), new TxString("测试" + i));
                 rmq.push(tx.toString());
             }
         } catch (Exception e) {
@@ -176,7 +181,7 @@ public class RunUtil {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_ID_QUEUE);
         try {
             for (int i = 0; i < 1000; i++) {
-                Transaction tx = TransactionService.genTx("string" + i, "测试" + i);
+                Transaction tx = TransactionService.genTx(TxType.INSERT.getName(), new TxString("测试" + i));
                 rmq.push(tx.getTxId());
             }
         } catch (Exception e) {
