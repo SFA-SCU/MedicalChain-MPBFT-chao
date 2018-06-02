@@ -17,6 +17,7 @@ import java.util.List;
  * 使用 junit 以单独运行一个方法
  * Created by chao on 2017/12/11.
  */
+
 public class RunUtil {
     private final static ObjectMapper objMapper = new ObjectMapper();
     private BlockService blockService = BlockService.getInstance();

@@ -6,3 +6,5 @@ publicKey.txt
 target
 log
 classes
+out
+META-INF
