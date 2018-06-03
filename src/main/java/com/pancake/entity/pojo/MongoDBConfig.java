@@ -2,6 +2,7 @@ package com.pancake.entity.pojo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pancake.entity.util.NetAddress;
 
 /**
  * Created by chao on 2018/6/2.
@@ -12,6 +13,12 @@ public class MongoDBConfig {
     private String database;
 
     public MongoDBConfig() {
+    }
+
+    public MongoDBConfig(NetAddress netAddress, String database) {
+        this.ip = netAddress.getIp();
+        this.port = netAddress.getPort();
+        this.database = database;
     }
 
     public MongoDBConfig(String ip, int port, String database) {

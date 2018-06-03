@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%--
   Created by IntelliJ IDEA.
   User: chao
@@ -8,11 +9,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>首页</title>
+    <title>管理</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 引入 Bootstrap -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="css/my.css" rel="stylesheet">
     <!-- HTML5 Shiv 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
     <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
     <!--[if lt IE 9]>
@@ -40,17 +41,18 @@
                 </div>
             </div>
             <div class="row clearfix" style="width: 100%;height: 100%; margin-top: 0px">
-                <div class="col-md-2 column" style="border: 1px solid gray;height: 100%;background-color: #213039;margin-top: 0px">
+                <div class="col-md-2 column"
+                     style="border: 1px solid gray;height: 100%;background-color: #213039;margin-top: 0px">
                     <br>
                     <ul class="nav nav-stacked nav-pills">
                         <li>
                             <a href="/"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">简介</span></a>
                         </li>
                         <li>
-                            <a href="manage"><span  style="color: #dbdbdb; font-size: 20px; font-weight: bold">管理</span></a>
+                            <a href="manage"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">管理</span></a>
                         </li>
                         <li>
-                            <a href="#"><span  style="color: #dbdbdb; font-size: 20px; font-weight: bold">信息</span></a>
+                            <a href="#"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">信息</span></a>
                         </li>
                         <!--
                         <li class="dropdown pull-right">
@@ -77,17 +79,104 @@
                 </div>
                 <div class="col-md-10 column">
                     <h2>
-                        简介
+                        添加传染病信息
                     </h2>
-                    <p>
-                        <span style="font-size: 16px;">
-                            Medical Chain 是采用 PBFT 算法（Practical Byzantine Fault Tolerance）作为共识算法，专用于医疗领域
-                            的区块链系统。其组件由 Validator（验证器）、Blocker（区块生成器）和 Client（交互客户端）组成。
-                        </span>
-                    </p>
-                    <p>
-                        <a class="btn" href="#">详细 »</a>
-                    </p>
+                    <br>
+                    <form action="${pageContext.request.contextPath}/record/save" method="post">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>
+                                    <span>交易单ID：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${tx.txId}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>数字签名：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${tx.signature}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>交易单类型：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${tx.txType}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>公钥：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${tx.pubKey}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>时间戳：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${tx.timestamp}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>报告卡编号：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${tx.content.id}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>患者姓名：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="patientName" value="${tx.content.patientName}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>身份证号：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="patientId" value="${tx.content.patientId}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>诊断日期：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="diagnosisDate" value="${tx.content.diagnosisDate}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>传染病名称：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="infectionName" value="${tx.content.infectionName}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>报告单位：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="reportOrganization" value="${tx.content.reportOrganization}">
+                                </td>
+                            </tr>
+                        </table>
+                        <button type="submit" class="btn btn-primary btn-lg">提交修改</button>
+                    </form>
+
+
                 </div>
             </div>
             <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -117,7 +206,8 @@
                             <a href="#">节点</a>
                         </li>
                     </ul>
-                    <form class="navbar-form navbar-left" role="search" action="${pageContext.request.contextPath}/tx/search">
+                    <form class="navbar-form navbar-left" role="search"
+                          action="${pageContext.request.contextPath}/tx/search">
                         <div class="form-group">
                             <input type="text" class="form-control" placeholder="交易单ID" name="txId"/>
                         </div>

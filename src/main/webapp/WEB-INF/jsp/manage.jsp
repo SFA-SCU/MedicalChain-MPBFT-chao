@@ -113,9 +113,9 @@
                             <a href="#">节点</a>
                         </li>
                     </ul>
-                    <form class="navbar-form navbar-left" role="search">
+                    <form class="navbar-form navbar-left" role="search" action="${pageContext.request.contextPath}/tx/search">
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="交易单ID"/>
+                            <input type="text" class="form-control" placeholder="交易单ID"  name="txId"/>
                         </div>
                         <button type="submit" class="btn btn-default">搜索</button>
                     </form>

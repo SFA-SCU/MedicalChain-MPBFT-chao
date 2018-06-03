@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%--
   Created by IntelliJ IDEA.
   User: chao
@@ -134,6 +135,10 @@
                     </table>
                         <button type="submit" class="btn btn-primary btn-lg">提交</button>
                     </form>
+                <c:if test = "${'${txId}' != null}">
+                    <span>提交成功，生成交易单 ID 为：<span style="color: #F00056">${txId}</span></span>
+                </c:if>
+
                 </div>
             </div>
             <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -163,9 +168,9 @@
                             <a href="#">节点</a>
                         </li>
                     </ul>
-                    <form class="navbar-form navbar-left" role="search">
+                    <form class="navbar-form navbar-left" role="search" action="${pageContext.request.contextPath}/tx/search">
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="交易单ID"/>
+                            <input type="text" class="form-control" placeholder="交易单ID"  name="txId"/>
                         </div>
                         <button type="submit" class="btn btn-default">搜索</button>
                     </form>

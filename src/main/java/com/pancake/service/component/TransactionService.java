@@ -5,9 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.dao.TransactionDao;
 import com.pancake.entity.component.Transaction;
 import com.pancake.entity.content.TxContent;
-import com.pancake.util.JsonUtil;
-import com.pancake.util.SignatureUtil;
-import com.pancake.util.TimeUtil;
+import com.pancake.entity.pojo.MongoDBConfig;
+import com.pancake.entity.util.Const;
+import com.pancake.entity.util.NetAddress;
+import com.pancake.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,42 @@ public class TransactionService {
     public static TransactionService getInstance() {
         return LazyHolder.INSTANCE;
     }
+
+    /**
+     * 到配置文件中的mongodb查询主节点中的 tx
+     * @param txId
+     * @return
+     */
+    public Transaction findById(String txId) {
+        return this.findById(txId, JsonUtil.getMongoDBConfig(Const.BlockChainConfigFile), NetUtil.getPrimaryNode());
+    }
+
+    /**
+     * 根据 TxId 到指定 mongodb 获取 tx
+     * @param txId
+     * @param mongoDBConfig
+     * @return
+     */
+    public Transaction findById(String txId, MongoDBConfig mongoDBConfig, NetAddress netAddress) {
+        MongoDB mongoDB = new MongoDB(mongoDBConfig);
+        String txCollection = netAddress + "." + Const.TX;
+        List<String> list = mongoDB.find("txId", txId, txCollection);
+        if (list.size() == 0)
+            return null;
+        else if (list.size() == 1) {
+            Transaction tx = null;
+            try {
+                tx = objectMapper.readValue(list.get(0), Transaction.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return tx;
+        } else {
+            logger.error("id 为： " + txId + " 的记录存在多条");
+            return null;
+        }
+    }
+
 
     /**
      * 根据 id 判断 tx 是否存在于集合 collectionName 中

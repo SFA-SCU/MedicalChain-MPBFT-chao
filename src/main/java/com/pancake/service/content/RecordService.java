@@ -28,7 +28,12 @@ public class RecordService {
         rmq = new RabbitmqUtil(Const.TX_QUEUE, configFile.getPath());
     }
 
-    public void save(Record record) {
+    /**
+     * 根据 record 生成交易单，并将交易单存储在区块中
+     * @param record
+     * @return 返回交易单ID
+     */
+    public String save(Record record) {
         // 若 record 的类型没有设置，则设为类名
         if(record.getContentType() == null || record.getContentType().trim().equals("")) {
             record.setContentType(record.getClass().getSimpleName());
@@ -47,5 +52,10 @@ public class RecordService {
         } else {
             logger.error("tx 为 null");
         }
+
+        if(tx == null) {
+            return null;
+        }
+        return tx.getTxId();
     }
 }

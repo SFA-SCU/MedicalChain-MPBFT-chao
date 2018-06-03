@@ -29,7 +29,10 @@ public class RecordController {
     public ModelAndView save(Record record) {
         logger.info("record:" + record);
         RecordService recordService = new RecordService();
-        recordService.save(record);
-        return new ModelAndView("record/add");
+        String txId = recordService.save(record);
+
+        ModelAndView mav = new ModelAndView("record/add");
+        mav.addObject("txId", txId);
+        return mav;
     }
 }

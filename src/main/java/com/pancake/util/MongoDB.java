@@ -15,7 +15,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import static com.mongodb.client.model.Filters.eq;
 
 /**
  * Created by chao on 2018/6/1.
@@ -71,6 +74,40 @@ public class MongoDB {
         options.build();
         mongoDatabase = mongoClient.getDatabase(database);
     }
+
+    public MongoDB(MongoDBConfig mongoDBConfig) {
+        this.database = mongoDBConfig.getDatabase();
+        mongoClient = new MongoClient(mongoDBConfig.getIp(), mongoDBConfig.getPort());
+        MongoClientOptions.Builder options = new MongoClientOptions.Builder();
+        // options.autoConnectRetry(true);// 自动重连true
+        // options.maxAutoConnectRetryTime(10); // the maximum auto connect retry time
+        options.connectionsPerHost(300);// 连接池设置为300个连接,默认为100
+        options.connectTimeout(15000);// 连接超时，推荐>3000毫秒
+        options.maxWaitTime(5000); //
+        options.socketTimeout(0);// 套接字超时时间，0无限制
+        options.threadsAllowedToBlockForConnectionMultiplier(5000);// 线程队列数，如果连接线程排满了队列就会抛出“Out of semaphores to get db”错误。
+        options.writeConcern(WriteConcern.ACKNOWLEDGED);//
+        options.build();
+        mongoDatabase = mongoClient.getDatabase(database);
+    }
+
+    /**
+     * 获取所有满足 key = value 的文档
+     *
+     * @param key
+     * @param value
+     * @param collectionName
+     * @return
+     */
+    public List<String> find(String key, String value, String collectionName) {
+        List<String> result = new ArrayList<String>();
+        MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+        for (Document document : collection.find(eq(key, value))) {
+            result.add(document.toJson());
+        }
+        return result;
+    }
+
 
     /**
      * 获取集合 collectionName 中的记录数
