@@ -3,6 +3,7 @@ package com.pancake.service.component;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.dao.TransactionDao;
+import com.pancake.entity.component.Block;
 import com.pancake.entity.component.Transaction;
 import com.pancake.entity.content.TxContent;
 import com.pancake.entity.pojo.MongoDBConfig;
@@ -67,7 +68,55 @@ public class TransactionService {
             }
             return tx;
         } else {
-            logger.error("id 为： " + txId + " 的记录存在多条");
+            logger.error("id 为： " + txId + " 的tx记录存在多条");
+            return null;
+        }
+    }
+
+    /**
+     * 到配置文件中的mongodb查询主节点中的 block
+     * @param txId
+     * @return
+     */
+    public Block findBlockById(String txId) {
+        return this.findBlockById(txId, JsonUtil.getMongoDBConfig(Const.BlockChainConfigFile), NetUtil.getPrimaryNode());
+    }
+
+    /**
+     * 到配置文件中的mongodb查询主节点中的 block id
+     * @param txId
+     * @return
+     */
+    public String findBlockIdById(String txId) {
+        Block block = this.findBlockById(txId, JsonUtil.getMongoDBConfig(Const.BlockChainConfigFile),
+                NetUtil.getPrimaryNode());
+        return block.getBlockId();
+    }
+
+    /**
+     * 根据 TxId 到指定 mongodb 获取 block
+     * @param txId
+     * @param mongoDBConfig
+     * @return
+     */
+    public Block findBlockById(String txId, MongoDBConfig mongoDBConfig, NetAddress netAddress) {
+        MongoDB mongoDB = new MongoDB(mongoDBConfig);
+        String txCollection = netAddress + "." + Const.BLOCK_CHAIN;
+        // "txIdList", txId 是查询数组的方式
+        List<String> list = mongoDB.find("txIdList", txId, txCollection);
+        //noinspection Duplicates
+        if (list.size() == 0)
+            return null;
+        else if (list.size() == 1) {
+            Block block = null;
+            try {
+                block  = objectMapper.readValue(list.get(0), Block.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return block ;
+        } else {
+            logger.error("id 为： " + txId + " 的block记录存在多条");
             return null;
         }
     }

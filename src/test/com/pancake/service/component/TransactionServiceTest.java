@@ -22,4 +22,10 @@ public class TransactionServiceTest {
     public void findById1() throws Exception {
     }
 
+    @Test
+    public void findBlockIdById() {
+        String blockId = txSrv.findBlockIdById("G2Mj0xM6c+ZOw7j50Y7tdgKd396x+BSBznhuGump9bk=");
+        System.out.println(blockId);
+    }
+
 }

@@ -24,7 +24,9 @@ public class TransactionController {
         logger.info("txId 为: " + txId);
         ModelAndView mav = new ModelAndView("/transaction/show");
         Transaction tx = txSrv.findById(txId);
+        String blockId = txSrv.findBlockIdById(txId);
         mav.addObject("tx", tx);
+        mav.addObject("blockId", blockId);
         return mav;
     }
 }

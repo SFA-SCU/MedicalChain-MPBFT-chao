@@ -38,7 +38,7 @@ public class RunUtil {
     }
 
     public void sendGenesisBlock() {
-        String txId = "-1";
+        String txId = Const.GENESIS_TX_ID;
         List<String> txIdList = new ArrayList<String>();
         txIdList.add(txId);
         Block block = blockService.genBlock(Const.GENESIS_BLOCK_ID, txIdList);

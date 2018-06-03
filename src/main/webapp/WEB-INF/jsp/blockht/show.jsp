@@ -46,14 +46,9 @@
                     <br>
                     <ul class="nav nav-stacked nav-pills">
                         <li>
-                            <a href="/"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">简介</span></a>
+                            <a href="/"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">搜索</span></a>
                         </li>
-                        <li>
-                            <a href="manage"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">管理</span></a>
-                        </li>
-                        <li>
-                            <a href="#"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">信息</span></a>
-                        </li>
+
                         <!--
                         <li class="dropdown pull-right">
                             <a href="#" data-toggle="dropdown" class="dropdown-toggle">下拉<strong class="caret"></strong></a>
@@ -79,51 +74,33 @@
                 </div>
                 <div class="col-md-10 column">
                     <h2>
-                        添加传染病信息
+                        区块信息
                     </h2>
                     <br>
                     <form action="${pageContext.request.contextPath}/record/save" method="post">
                         <table class="table table-bordered">
                             <tr>
                                 <th>
-                                    <span>交易单ID：</span>
+                                    <span>区块ID：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.txId}" readonly="readonly">
+                                    <input type="text" class="form-control" name="id" value="${block.blockId}">
                                 </td>
                             </tr>
                             <tr>
                                 <th>
-                                    <span>所在区块ID：</span>
+                                    <span>上一个区块ID：</span>
                                 </th>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/block/search?blockId=${blockId}">
-                                        <input type="text" class="form-control" name="id" value="${blockId}" readonly="readonly">
-                                    </a>
+                                    <input type="text" class="form-control" name="id" value="${block.preBlockId}">
                                 </td>
                             </tr>
                             <tr>
                                 <th>
-                                    <span>数字签名：</span>
+                                    <span>Merkle Tree 树根哈希值：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.signature}">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <span>交易单类型：</span>
-                                </th>
-                                <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.txType}">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <span>公钥：</span>
-                                </th>
-                                <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.pubKey}">
+                                    <input type="text" class="form-control" name="id" value="${block.treeHash}">
                                 </td>
                             </tr>
                             <tr>
@@ -131,39 +108,50 @@
                                     <span>时间戳：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.timestamp}">
+                                    <input type="text" class="form-control" name="id" value="${block.timestamp}">
                                 </td>
                             </tr>
                             <tr>
                                 <th>
-                                    <span>报告卡编号：</span>
+                                    <span>交易单数量：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.content.id}">
+                                    <input type="text" class="form-control" name="id" value="${block.txCount}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th colspan="2">
+                                    <span>交易单ID</span>
+                                </th>
+                            </tr>
+
+                            <c:set var="index" value="1"/>
+                            <c:forEach items="${block.txIdList}" var="txId">
+                            <tr>
+                                <th>
+                                    <span style="font-size: 13px; color: #F00056">交易单${index}：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${txId}">
+                                </td>
+                                <c:set var="index" value="${index} + 1"/>
+                            </tr>
+                            </c:forEach>
+
+                            <tr>
+                                <th>
+                                    <span>公钥：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="patientId" value="${block.pubKey}">
                                 </td>
                             </tr>
                             <tr>
                                 <th>
-                                    <span>患者姓名：</span>
+                                    <span>数字签名：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="patientName" value="${tx.content.patientName}">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <span>身份证号：</span>
-                                </th>
-                                <td>
-                                    <input type="text" class="form-control" name="patientId" value="${tx.content.patientId}">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <span>诊断日期：</span>
-                                </th>
-                                <td>
-                                    <input type="text" class="form-control" name="diagnosisDate" value="${tx.content.diagnosisDate}">
+                                    <input type="text" class="form-control" name="diagnosisDate" value="${block.signature}">
                                 </td>
                             </tr>
                             <tr>

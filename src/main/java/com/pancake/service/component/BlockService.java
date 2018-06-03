@@ -7,7 +7,9 @@ import com.pancake.entity.component.Block;
 import com.pancake.entity.component.MerkleTree;
 import com.pancake.entity.content.TxString;
 import com.pancake.entity.enumeration.TxType;
+import com.pancake.entity.pojo.MongoDBConfig;
 import com.pancake.entity.util.Const;
+import com.pancake.entity.util.NetAddress;
 import com.pancake.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,42 @@ public class BlockService {
     private BlockService (){}
     public static BlockService getInstance() {
         return LazyHolder.INSTANCE;
+    }
+
+    /**
+     * 到配置文件中的mongodb查询主节点中的 block
+     * @param blockId
+     * @return
+     */
+    public Block findById(String blockId) {
+        return this.findById(blockId, JsonUtil.getMongoDBConfig(Const.BlockChainConfigFile), NetUtil.getPrimaryNode());
+    }
+
+    /**
+     * 根据 TxId 到指定 mongodb 获取 block
+     * @param blockId
+     * @param mongoDBConfig
+     * @return
+     */
+    public Block findById(String blockId, MongoDBConfig mongoDBConfig, NetAddress netAddress) {
+        MongoDB mongoDB = new MongoDB(mongoDBConfig);
+        String blockCollection = netAddress + "." + Const.BLOCK_CHAIN;
+        List<String> list = mongoDB.find("blockId", blockId, blockCollection);
+        //noinspection Duplicates
+        if (list.size() == 0)
+            return null;
+        else if (list.size() == 1) {
+            Block block = null;
+            try {
+                block = objectMapper.readValue(list.get(0), Block.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return block;
+        } else {
+            logger.error("id 为： " + blockId + " 的block记录存在多条");
+            return null;
+        }
     }
 
     /**
