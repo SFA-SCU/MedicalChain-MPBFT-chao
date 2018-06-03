@@ -22,4 +22,9 @@ public class ManageController {
         return new ModelAndView("index");
     }
 
+    @RequestMapping(value = "/manage")
+    public ModelAndView toManage(HttpServletRequest request, HttpServletResponse response) {
+        return new ModelAndView("manage");
+    }
+
 }

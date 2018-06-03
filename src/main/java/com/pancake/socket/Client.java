@@ -20,6 +20,7 @@ public class Client {
 
     public static void main(String[] args) {
         TransactionMessageService txMsgService = TransactionMessageService.getInstance();
+        TransactionService txService = TransactionService.getInstance();
         String serverName = "127.0.0.1";
         int port = 8000;
         try
@@ -31,7 +32,7 @@ public class Client {
             OutputStream outToServer = client.getOutputStream();
             DataOutputStream out = new DataOutputStream(outToServer);
             List<Transaction> txList = new ArrayList<Transaction>();
-            txList.add(TransactionService.genTx(TxType.INSERT.getName(), new TxString("测试")));
+            txList.add(txService.genTx(TxType.INSERT.getName(), new TxString("测试")));
             String txMsg = txMsgService.genInstance(txList).toString();
             out.writeUTF(txMsg);
 

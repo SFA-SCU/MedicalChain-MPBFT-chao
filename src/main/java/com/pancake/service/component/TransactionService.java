@@ -71,7 +71,7 @@ public class TransactionService {
      * @return
      * @throws Exception
      */
-    public static Transaction genTx(String txType, TxContent content) throws Exception {
+    public Transaction genTx(String txType, TxContent content) throws Exception {
         if (content == null) {
             logger.error("content内容为null");
             throw new Exception("content内容为null");

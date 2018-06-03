@@ -8,7 +8,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>首页</title>
+    <title>管理</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 引入 Bootstrap -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
@@ -40,17 +40,18 @@
                 </div>
             </div>
             <div class="row clearfix" style="width: 100%;height: 100%; margin-top: 0px">
-                <div class="col-md-2 column" style="border: 1px solid gray;height: 100%;background-color: #213039;margin-top: 0px">
+                <div class="col-md-2 column"
+                     style="border: 1px solid gray;height: 100%;background-color: #213039;margin-top: 0px">
                     <br>
                     <ul class="nav nav-stacked nav-pills">
                         <li>
                             <a href="/"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">简介</span></a>
                         </li>
                         <li>
-                            <a href="manage"><span  style="color: #dbdbdb; font-size: 20px; font-weight: bold">管理</span></a>
+                            <a href="manage"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">管理</span></a>
                         </li>
                         <li>
-                            <a href="#"><span  style="color: #dbdbdb; font-size: 20px; font-weight: bold">信息</span></a>
+                            <a href="#"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">信息</span></a>
                         </li>
                         <!--
                         <li class="dropdown pull-right">
@@ -77,17 +78,12 @@
                 </div>
                 <div class="col-md-10 column">
                     <h2>
-                        简介
+                        管理页面
                     </h2>
-                    <p>
-                        <span style="font-size: 16px;">
-                            Medical Chain 是采用 PBFT 算法（Practical Byzantine Fault Tolerance）作为共识算法，专用于医疗领域
-                            的区块链系统。其组件由 Validator（验证器）、Blocker（区块生成器）和 Client（交互客户端）组成。
-                        </span>
-                    </p>
-                    <p>
-                        <a class="btn" href="#">详细 »</a>
-                    </p>
+                    <br>
+                    <ul class="nav nav-stacked nav-pills">
+                        <a href="record/add"><li><span style="font-size: 16px;">添加传染病信息</span></li></a>
+                    </ul>
                 </div>
             </div>
             <nav class="navbar navbar-default navbar-fixed-top" role="navigation">

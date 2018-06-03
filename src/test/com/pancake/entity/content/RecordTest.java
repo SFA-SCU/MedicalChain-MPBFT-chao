@@ -14,7 +14,8 @@ public class RecordTest {
 
     @Test
     public void string() throws Exception {
-        Record record = new Record("123", "p123", "感冒");
+        Record record = new Record("123", "chao", "455", "111",
+                "111","111");
         String str = record.toString();
         String listString = objectMapper.writeValueAsString(Arrays.asList(record));
         System.out.println(str);

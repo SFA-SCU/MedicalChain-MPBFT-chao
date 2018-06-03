@@ -59,7 +59,7 @@
   },
 
   "key_pair": {
-    "pvt_key_file": "src/main/resources/privateKey.txt",
-    "pub_key_file": "src/main/resources/publicKey.txt"
+    "pvt_key_file": "C:\\Users\\chao\\privateKey.txt",
+    "pub_key_file": "C:\\Users\\chao\\publicKey.txt"
   }
 }

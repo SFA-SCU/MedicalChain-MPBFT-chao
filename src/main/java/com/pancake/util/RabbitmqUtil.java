@@ -25,21 +25,37 @@ public class RabbitmqUtil {
     private String queueName;
     private static ConnectionFactory factory = new ConnectionFactory();
 
-    static {
-
-        RabbitmqServer rabbitmqServer = JsonUtil.getRabbitmqServer(Const.BlockChainConfigFile);
-        if(rabbitmqServer != null) {
-            factory.setUsername(rabbitmqServer.getUserName());
-            factory.setPassword(rabbitmqServer.getPassword());
-//        factory.setVirtualHost(virtualHost);
-            factory.setHost(rabbitmqServer.getIp());
-            factory.setPort(rabbitmqServer.getPort());
-        } else {
-            logger.error("Rabbitmq 配置信息获取错误");
-        }
-    }
+//    static {
+//
+//        RabbitmqServer rabbitmqServer = JsonUtil.getRabbitmqServer(Const.BlockChainConfigFile);
+//        factory.setUsername(rabbitmqServer.getUserName());
+//        factory.setPassword(rabbitmqServer.getPassword());
+////        factory.setVirtualHost(virtualHost);
+//        factory.setHost(rabbitmqServer.getIp());
+//        factory.setPort(rabbitmqServer.getPort());
+//    }
 
     public RabbitmqUtil(String queueName) {
+        this.init(queueName, null);
+    }
+
+    public RabbitmqUtil(String queueName, String blockChainConfigFile) {
+        this.init(queueName, blockChainConfigFile);
+    }
+
+    public void init(String queueName, String blockChainConfigFile) {
+        RabbitmqServer rabbitmqServer = null;
+        if (blockChainConfigFile == null) {
+            rabbitmqServer = JsonUtil.getRabbitmqServer(Const.BlockChainConfigFile);
+        } else {
+            rabbitmqServer = JsonUtil.getRabbitmqServer(blockChainConfigFile);
+        }
+        factory.setUsername(rabbitmqServer.getUserName());
+        factory.setPassword(rabbitmqServer.getPassword());
+//        factory.setVirtualHost(virtualHost);
+        factory.setHost(rabbitmqServer.getIp());
+        factory.setPort(rabbitmqServer.getPort());
+
         this.queueName = queueName;
         try {
             Connection conn = factory.newConnection();
@@ -68,7 +84,7 @@ public class RabbitmqUtil {
             Connection conn = factory.newConnection();
             Channel channel = conn.createChannel();
             channel.queueDeclare(this.queueName, false, false, false, null);
-            channel.basicPublish("", this.queueName, null, message.getBytes());
+            channel.basicPublish("", this.queueName, null, message.getBytes("UTF-8"));
             logger.debug(" [x] Sent '" + message + "'");
             channel.close();
             conn.close();
@@ -90,7 +106,7 @@ public class RabbitmqUtil {
             Channel channel = conn.createChannel();
             for (String message : messages) {
                 channel.queueDeclare(this.queueName, false, false, false, null);
-                channel.basicPublish("", this.queueName, null, message.getBytes());
+                channel.basicPublish("", this.queueName, null, message.getBytes("UTF-8"));
                 logger.debug(" [x] Sent '" + message + "'");
             }
             channel.close();
@@ -112,7 +128,7 @@ public class RabbitmqUtil {
             Channel channel = conn.createChannel();
             if(channel.messageCount(this.queueName) > 0) {
                 GetResponse response = channel.basicGet(this.queueName, false);
-                content = new String(response.getBody());
+                content = new String(response.getBody(), "UTF-8");
                 logger.debug(content);
                 channel.basicAck(response.getEnvelope().getDeliveryTag(), false);
             } else {
@@ -146,7 +162,7 @@ public class RabbitmqUtil {
             while ((double) (System.nanoTime() - beginTime) / 1000000 < limitTime) {
                 if(channel.messageCount(this.queueName) > 0) {
                     GetResponse response = channel.basicGet(this.queueName, false);
-                    String msg = new String(response.getBody());
+                    String msg = new String(response.getBody(), "UTF-8");
                     // 2. 接收队列中消息的大小是否超过限制
                     totalLen += msg.getBytes(Const.CHAR_SET).length;
                     if (totalLen / Math.pow(1024, 2) < limitSize) {

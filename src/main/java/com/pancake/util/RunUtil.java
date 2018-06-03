@@ -28,6 +28,7 @@ public class RunUtil {
     private BlockService blockService = BlockService.getInstance();
     private BlockMessageService blockMsgServ = BlockMessageService.getInstance();
     private Blocker blocker = new Blocker();
+    private TransactionService txService = TransactionService.getInstance();
 
     public static void main(String[] args) {
         RunUtil runUtil = new RunUtil();
@@ -147,8 +148,8 @@ public class RunUtil {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_QUEUE);
         List<Transaction> txList = new ArrayList<Transaction>();
         try {
-            for (int i = 0; i < 100; i++) {
-                Transaction tx = TransactionService.genTx(TxType.INSERT.getName(), new TxString("测试" + i));
+            for (int i = 0; i < 1; i++) {
+                Transaction tx = txService.genTx(TxType.INSERT.getName(), new TxString("测试" + i));
 //                if(i<4) {
 //                    txList.add(tx);
 //                }
@@ -169,7 +170,7 @@ public class RunUtil {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.VERIFIED_TX_QUEUE);
         try {
             for (int i = 0; i < 50; i++) {
-                Transaction tx = TransactionService.genTx(TxType.INSERT.getName(), new TxString("测试" + i));
+                Transaction tx = txService.genTx(TxType.INSERT.getName(), new TxString("测试" + i));
                 rmq.push(tx.toString());
             }
         } catch (Exception e) {
@@ -181,7 +182,7 @@ public class RunUtil {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_ID_QUEUE);
         try {
             for (int i = 0; i < 1000; i++) {
-                Transaction tx = TransactionService.genTx(TxType.INSERT.getName(), new TxString("测试" + i));
+                Transaction tx = txService.genTx(TxType.INSERT.getName(), new TxString("测试" + i));
                 rmq.push(tx.getTxId());
             }
         } catch (Exception e) {
