@@ -79,6 +79,41 @@ public class BlockService {
     }
 
     /**
+     * 到配置文件中的mongodb查询主节点中的 block
+     * @return
+     */
+    public List<Block> findAll() {
+        return this.findAll(JsonUtil.getMongoDBConfig(Const.BlockChainConfigFile), NetUtil.getPrimaryNode());
+    }
+
+    /**
+     * 查询区块链中所有区块
+     * @param validatorMongodb
+     * @param validatorAddr
+     * @return
+     */
+    public List<Block> findAll(MongoDBConfig validatorMongodb, NetAddress validatorAddr) {
+        MongoDB mongoDB = new MongoDB(validatorMongodb);
+        String blockCollection = validatorAddr + "." + Const.BLOCK_CHAIN;
+        List<Block> blocks = new ArrayList<Block>();
+        List<String> list = null;
+        list = mongoDB.findAllSort(blockCollection, "timestamp", Const.DESC);
+
+        if (list != null) {
+            for (String str : list) {
+                try {
+                    blocks.add(objectMapper.readValue(str, Block.class));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return blocks;
+        }
+
+        return null;
+    }
+
+    /**
      * 根据如下参数算出当前区块的id，并构造Block对象
      *
      * @param preBlockId

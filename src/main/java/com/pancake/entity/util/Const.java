@@ -49,4 +49,5 @@ public class Const {
 
     public final static double TX_ID_LIST_SIZE = 20 / 1024.0; // 单位 MB
     public final static int TIME_OUT = 10000;
+    public final static int CONN_TIME_OUT = 4000; // 4 秒
 }

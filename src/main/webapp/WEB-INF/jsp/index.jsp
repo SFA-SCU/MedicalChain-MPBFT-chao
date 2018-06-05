@@ -102,10 +102,10 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
                         <li class="active">
-                            <a href="#">首页</a>
+                            <a href="${pageContext.request.contextPath}/">首页</a>
                         </li>
                         <li>
-                            <a href="#">区块链</a>
+                            <a href="${pageContext.request.contextPath}/block/blockchain">区块链</a>
                         </li>
                         <li>
                             <a href="#">区块</a>
@@ -114,7 +114,7 @@
                             <a href="#">交易单</a>
                         </li>
                         <li>
-                            <a href="#">节点</a>
+                            <a href="${pageContext.request.contextPath}/node/show">节点</a>
                         </li>
                     </ul>
                     <form class="navbar-form navbar-left" role="search" action="${pageContext.request.contextPath}/tx/search">

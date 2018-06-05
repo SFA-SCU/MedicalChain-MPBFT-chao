@@ -3,6 +3,7 @@ package com.pancake.util;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.WriteConcern;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.Set;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Sorts.ascending;
+import static com.mongodb.client.model.Sorts.descending;
 
 /**
  * Created by chao on 2018/6/1.
@@ -89,6 +92,26 @@ public class MongoDB {
         options.writeConcern(WriteConcern.ACKNOWLEDGED);//
         options.build();
         mongoDatabase = mongoClient.getDatabase(database);
+    }
+
+    @SuppressWarnings("Duplicates")
+    public List<String> findAllSort(String collectionName, String sortKey, String sortForm) {
+        MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+        FindIterable<Document> findIterable = null;
+        if (sortForm.equals(Const.DESC)) {
+            findIterable = collection.find().sort(descending(sortKey));
+        } else if (sortForm.equals(Const.ASC)) {
+            findIterable = collection.find().sort(ascending(sortKey));
+        }
+        MongoCursor<Document> mongoCursor = findIterable.iterator();
+        List<String> list = new ArrayList<String>();
+        String record;
+        while (mongoCursor.hasNext()) {
+            record = mongoCursor.next().toJson();
+            list.add(record);
+            logger.debug("record: " + record);
+        }
+        return list;
     }
 
     /**

@@ -74,106 +74,60 @@
                 </div>
                 <div class="col-md-10 column">
                     <h2>
-                        区块信息
+                        节点信息
                     </h2>
                     <br>
-                    <form action="${pageContext.request.contextPath}/record/save" method="post">
-                        <table class="table table-bordered">
-                            <tr>
-                                <th>
-                                    <span>区块ID：</span>
-                                </th>
-                                <td>
-                                    <input type="text" class="form-control" name="id" value="${block.blockId}">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <span>上一个区块ID：</span>
-                                </th>
-                                <td>
-                                    <input type="text" class="form-control" name="id" value="${block.preBlockId}">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <span>Merkle Tree 树根哈希值：</span>
-                                </th>
-                                <td>
-                                    <input type="text" class="form-control" name="id" value="${block.treeHash}">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <span>时间戳：</span>
-                                </th>
-                                <td>
-                                    <input type="text" class="form-control" name="id" value="${block.timestamp}">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <span>交易单数量：</span>
-                                </th>
-                                <td>
-                                    <input type="text" class="form-control" name="id" value="${block.txCount}">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th colspan="2">
-                                    <span>交易单ID</span>
-                                </th>
-                            </tr>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th colspan="2">
+                                <span>验证器（Validator）</span>
+                            </th>
+                        </tr>
+                        <c:set var="index" value="1"/>
+                        <c:forEach items="${validatorsStatus}" var="validatorStatus">
+                        <tr>
+                            <th>
+                                <p>Validator${index} [ ${validatorStatus.key.ip}:${validatorStatus.key.port} ]</p>
+                            </th>
+                            <td>
+                                <c:if test="${validatorStatus.value == true}">
+                                    <h4><span class="label label-success">在线</span></h4>
+                                </c:if>
+                                <c:if test="${validatorStatus.value == false}">
+                                    <h4><span class="label label-danger">离线</span></h4>
+                                </c:if>
 
-                            <c:set var="index" value="1"/>
-                            <c:forEach items="${block.txIdList}" var="txId">
+                            </td>
+                            <c:set var="index" value="${index + 1}"/>
+                        </tr>
+                        </c:forEach>
+                    </table>
+                    <br>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th colspan="2">
+                                <span>打包器（Blocker）</span>
+                            </th>
+                        </tr>
+                        <c:set var="index" value="1"/>
+                        <c:forEach items="${blockersStatus}" var="blockerStatus">
                             <tr>
                                 <th>
-                                    <span style="font-size: 13px; color: #F00056">交易单${index}：</span>
+                                    <p>Blocker${index} [ ${blockerStatus.key.ip}:${blockerStatus.key.port} ]</p>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${txId}">
-                                </td>
-                                <c:set var="index" value="${index} + 1"/>
-                            </tr>
-                            </c:forEach>
+                                    <c:if test="${blockerStatus.value == true}">
+                                        <h4><span class="label label-success">在线</span></h4>
+                                    </c:if>
+                                    <c:if test="${blockerStatus.value == false}">
+                                        <h4><span class="label label-danger">离线</span></h4>
+                                    </c:if>
 
-                            <tr>
-                                <th>
-                                    <span>公钥：</span>
-                                </th>
-                                <td>
-                                    <input type="text" class="form-control" name="patientId" value="${block.pubKey}">
                                 </td>
+                                <c:set var="index" value="${index + 1}"/>
                             </tr>
-                            <tr>
-                                <th>
-                                    <span>数字签名：</span>
-                                </th>
-                                <td>
-                                    <input type="text" class="form-control" name="diagnosisDate" value="${block.signature}">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <span>传染病名称：</span>
-                                </th>
-                                <td>
-                                    <input type="text" class="form-control" name="infectionName" value="${tx.content.infectionName}">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    <span>报告单位：</span>
-                                </th>
-                                <td>
-                                    <input type="text" class="form-control" name="reportOrganization" value="${tx.content.reportOrganization}">
-                                </td>
-                            </tr>
-                        </table>
-                        <button type="submit" class="btn btn-primary btn-lg">提交修改</button>
-                    </form>
-
+                        </c:forEach>
+                    </table>
 
                 </div>
             </div>
@@ -188,11 +142,11 @@
 
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
-                        <li class="active">
-                            <a href="#">首页</a>
+                        <li>
+                            <a href="/">首页</a>
                         </li>
                         <li>
-                            <a href="#">区块链</a>
+                            <a href="${pageContext.request.contextPath}/block/blockchain">区块链</a>
                         </li>
                         <li>
                             <a href="#">区块</a>
@@ -200,8 +154,8 @@
                         <li>
                             <a href="#">交易单</a>
                         </li>
-                        <li>
-                            <a href="#">节点</a>
+                        <li class="active">
+                            <a href="${pageContext.request.contextPath}/node/show">节点</a>
                         </li>
                     </ul>
                     <form class="navbar-form navbar-left" role="search"

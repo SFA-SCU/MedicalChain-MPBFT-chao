@@ -84,6 +84,14 @@ public class JsonUtil {
     }
 
     /**
+     * 读取BlockChainConfigFile文件，解析后返回 ValidatorAddress list
+     * @return
+     */
+    public static List<NetAddress> getValidatorAddressList() {
+        return getValidatorAddressList(Const.BlockChainConfigFile);
+    }
+
+    /**
      * 从指定路径读取json文件，解析后返回 ValidatorAddress list
      *
      * @return
@@ -101,6 +109,14 @@ public class JsonUtil {
     }
 
     /**
+     * 读取BlockChainConfigFile文件，解析后返回 BlockerAddress list
+     * @return
+     */
+    public static List<NetAddress> getBlockerAddressList() {
+        return getBlockerAddressList(Const.BlockChainConfigFile);
+    }
+
+    /**
      * 从指定路径读取json文件，解析后返回 BlockerAddress list
      *
      * @return
@@ -110,6 +126,23 @@ public class JsonUtil {
         Map map = jsonToMap(jsonStr);
         //noinspection unchecked
         List<Map> list = (List<Map>) map.get("blockers");
+        List<NetAddress> addrList = new ArrayList<NetAddress>();
+        for(Map tmpMap : list) {
+            addrList.add(new NetAddress((String)tmpMap.get("ip"), (Integer) tmpMap.get("port")));
+        }
+        return addrList;
+    }
+
+    /**
+     * 从指定路径读取json文件，解析后返回 Validator 的 mongodb 的地址 list
+     *
+     * @return
+     */
+    public static List<NetAddress> getValidatorMongoAddr(String jsonFile) {
+        String jsonStr = getStrByJsonFile(jsonFile);
+        Map map = jsonToMap(jsonStr);
+        //noinspection unchecked
+        List<Map> list = (List<Map>) map.get("validator_mongodb");
         List<NetAddress> addrList = new ArrayList<NetAddress>();
         for(Map tmpMap : list) {
             addrList.add(new NetAddress((String)tmpMap.get("ip"), (Integer) tmpMap.get("port")));

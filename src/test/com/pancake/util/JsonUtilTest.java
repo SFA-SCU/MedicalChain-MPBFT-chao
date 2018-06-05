@@ -19,4 +19,9 @@ public class JsonUtilTest {
     public void getCurrentBlocker() {
         System.out.println(JsonUtil.getCurrentBlocker(Const.BlockChainConfigFile));
     }
+
+    @Test
+    public void getValidatorMongoAddr() {
+        System.out.println(JsonUtil.getValidatorMongoAddr(Const.BlockChainConfigFile));
+    }
 }

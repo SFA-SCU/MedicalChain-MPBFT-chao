@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
+
 /**
  * Created by chao on 2018/6/3.
  */
@@ -22,10 +24,18 @@ public class BlockController {
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public ModelAndView search(@RequestParam("blockId") String blockId) {
         logger.info("blockId 为: " + blockId);
-        ModelAndView mav = new ModelAndView("/blockht/show");
+        ModelAndView mav = new ModelAndView("/block_html/show");
         Block block = blockService.findById(blockId);
 //        logger.info("block: " + block);
         mav.addObject("block", block);
+        return mav;
+    }
+
+    @RequestMapping(value = "/blockchain", method = RequestMethod.GET)
+    public ModelAndView blockchain() {
+        ModelAndView mav = new ModelAndView("/block_html/blockchain");
+        List<Block> blockList = blockService.findAll();
+        mav.addObject("blockList", blockList);
         return mav;
     }
 }
