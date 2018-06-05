@@ -19,6 +19,12 @@ public class TransactionController {
     private final static Logger logger = LoggerFactory.getLogger(TransactionController.class);
     private TransactionService txSrv = TransactionService.getInstance();
 
+    @RequestMapping(value = "/index", method = RequestMethod.GET)
+    public ModelAndView index() {
+        ModelAndView mav = new ModelAndView("/transaction/index");
+        return mav;
+    }
+
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public ModelAndView search(@RequestParam("txId") String txId) {
         logger.info("txId 为: " + txId);

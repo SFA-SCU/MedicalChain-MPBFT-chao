@@ -46,7 +46,7 @@
                     <br>
                     <ul class="nav nav-stacked nav-pills">
                         <li>
-                            <a href="/"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">搜索</span></a>
+                            <a href="${pageContext.request.contextPath}/block/index"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">首页</span></a>
                         </li>
 
                         <!--
@@ -77,16 +77,19 @@
                         区块首页
                     </h2>
                     <br>
+                    <form action="${pageContext.request.contextPath}/block/search" method="get">
                     <table class="table table-bordered">
                         <tr>
                             <th>
-                                <span>区块ID：</span>
+                                <input type="text" class="form-control" name="blockId" placeholder="请输入区块ID">
                             </th>
                             <td>
-                                <input type="text" class="form-control" name="id" value="${block.blockId}">
+
+                                <button type="submit" class="btn btn-primary">提交</button>
                             </td>
                         </tr>
                     </table>
+                    </form>
 
                 </div>
             </div>
@@ -102,16 +105,16 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
                         <li>
-                            <a href="#">首页</a>
+                            <a href="${pageContext.request.contextPath}/">首页</a>
                         </li>
                         <li>
-                            <a href="#">区块链</a>
+                            <a href="${pageContext.request.contextPath}/block/blockchain">区块链</a>
                         </li>
                         <li class="active">
-                            <a href="#">区块</a>
+                            <a href="${pageContext.request.contextPath}/block/index">区块</a>
                         </li>
                         <li>
-                            <a href="#">交易单</a>
+                            <a href="${pageContext.request.contextPath}/tx/index">交易单</a>
                         </li>
                         <li>
                             <a href="${pageContext.request.contextPath}/node/show">节点</a>

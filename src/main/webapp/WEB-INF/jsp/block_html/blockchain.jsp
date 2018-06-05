@@ -46,7 +46,7 @@
                     <br>
                     <ul class="nav nav-stacked nav-pills">
                         <li>
-                            <a href="/"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">搜索</span></a>
+                            <a href="${pageContext.request.contextPath}/block/blockchain"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">首页</span></a>
                         </li>
 
                         <!--
@@ -187,10 +187,10 @@
                             <a href="${pageContext.request.contextPath}/block/blockchain">区块链</a>
                         </li>
                         <li>
-                            <a href="#">区块</a>
+                            <a href="${pageContext.request.contextPath}/block/index">区块</a>
                         </li>
                         <li>
-                            <a href="#">交易单</a>
+                            <a href="${pageContext.request.contextPath}/tx/index">交易单</a>
                         </li>
                         <li>
                             <a href="${pageContext.request.contextPath}/node/show">节点</a>

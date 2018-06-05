@@ -46,7 +46,7 @@
                     <br>
                     <ul class="nav nav-stacked nav-pills">
                         <li>
-                            <a href="${pageContext.request.contextPath}/node/show"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">首页</span></a>
+                            <a href="${pageContext.request.contextPath}/tx/index"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">首页</span></a>
                         </li>
 
                         <!--
@@ -74,60 +74,17 @@
                 </div>
                 <div class="col-md-10 column">
                     <h2>
-                        节点信息
+                        交易单首页
                     </h2>
                     <br>
+                    <form action="${pageContext.request.contextPath}/tx/search" method="get">
                     <table class="table table-bordered">
-                        <tr>
-                            <th colspan="2">
-                                <span>验证器（Validator）</span>
-                            </th>
-                        </tr>
-                        <c:set var="index" value="1"/>
-                        <c:forEach items="${validatorsStatus}" var="validatorStatus">
-                        <tr>
-                            <th>
-                                <p>Validator${index} [ ${validatorStatus.key.ip}:${validatorStatus.key.port} ]</p>
-                            </th>
-                            <td>
-                                <c:if test="${validatorStatus.value == true}">
-                                    <h4><span class="label label-success">在线</span></h4>
-                                </c:if>
-                                <c:if test="${validatorStatus.value == false}">
-                                    <h4><span class="label label-danger">离线</span></h4>
-                                </c:if>
-
-                            </td>
-                            <c:set var="index" value="${index + 1}"/>
-                        </tr>
-                        </c:forEach>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="交易单ID" name="txId"/>
+                        </div>
+                        <button type="submit" class="btn btn-default">搜索</button>
                     </table>
-                    <br>
-                    <table class="table table-bordered">
-                        <tr>
-                            <th colspan="2">
-                                <span>打包器（Blocker）</span>
-                            </th>
-                        </tr>
-                        <c:set var="index" value="1"/>
-                        <c:forEach items="${blockersStatus}" var="blockerStatus">
-                            <tr>
-                                <th>
-                                    <p>Blocker${index} [ ${blockerStatus.key.ip}:${blockerStatus.key.port} ]</p>
-                                </th>
-                                <td>
-                                    <c:if test="${blockerStatus.value == true}">
-                                        <h4><span class="label label-success">在线</span></h4>
-                                    </c:if>
-                                    <c:if test="${blockerStatus.value == false}">
-                                        <h4><span class="label label-danger">离线</span></h4>
-                                    </c:if>
-
-                                </td>
-                                <c:set var="index" value="${index + 1}"/>
-                            </tr>
-                        </c:forEach>
-                    </table>
+                    </form>
 
                 </div>
             </div>
@@ -143,7 +100,7 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
                         <li>
-                            <a href="/">首页</a>
+                            <a href="${pageContext.request.contextPath}/">首页</a>
                         </li>
                         <li>
                             <a href="${pageContext.request.contextPath}/block/blockchain">区块链</a>
@@ -151,10 +108,10 @@
                         <li>
                             <a href="${pageContext.request.contextPath}/block/index">区块</a>
                         </li>
-                        <li>
+                        <li class="active">
                             <a href="${pageContext.request.contextPath}/tx/index">交易单</a>
                         </li>
-                        <li class="active">
+                        <li>
                             <a href="${pageContext.request.contextPath}/node/show">节点</a>
                         </li>
                     </ul>

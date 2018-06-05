@@ -21,6 +21,12 @@ public class BlockController {
     private final static Logger logger = LoggerFactory.getLogger(BlockController.class);
     private BlockService blockService = BlockService.getInstance();
 
+    @RequestMapping(value = "/index", method = RequestMethod.GET)
+    public ModelAndView index() {
+        ModelAndView mav = new ModelAndView("/block_html/index");
+        return mav;
+    }
+
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public ModelAndView search(@RequestParam("blockId") String blockId) {
         logger.info("blockId 为: " + blockId);
