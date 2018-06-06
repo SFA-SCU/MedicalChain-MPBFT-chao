@@ -73,7 +73,7 @@
                 </div>
                 <div class="col-md-10 column">
                     <h2>
-                        添加传染病信息
+                        传染病信息
                     </h2>
                     <br>
                     <form action="${pageContext.request.contextPath}/record/save" method="post">
@@ -101,7 +101,7 @@
                                     <span>数字签名：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.signature}">
+                                    <input type="text" class="form-control" name="id" value="${tx.signature}" readonly="readonly">
                                 </td>
                             </tr>
                             <tr>
@@ -109,7 +109,7 @@
                                     <span>交易单类型：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.txType}">
+                                    <input type="text" class="form-control" name="id" value="${tx.txType}" readonly="readonly">
                                 </td>
                             </tr>
                             <tr>
@@ -117,7 +117,7 @@
                                     <span>公钥：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.pubKey}">
+                                    <input type="text" class="form-control" name="id" value="${tx.pubKey}" readonly="readonly">
                                 </td>
                             </tr>
                             <tr>
@@ -125,7 +125,7 @@
                                     <span>时间戳：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.timestamp}">
+                                    <input type="text" class="form-control" name="id" value="${tx.timestamp}" readonly="readonly">
                                 </td>
                             </tr>
                             <tr>

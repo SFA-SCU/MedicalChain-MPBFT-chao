@@ -1,6 +1,8 @@
 package com.pancake.web;
 
 import com.pancake.entity.component.Transaction;
+import com.pancake.entity.content.Record;
+import com.pancake.entity.content.TxString;
 import com.pancake.service.component.TransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +30,17 @@ public class TransactionController {
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public ModelAndView search(@RequestParam("txId") String txId) {
         logger.info("txId 为: " + txId);
-        ModelAndView mav = new ModelAndView("/transaction/show");
+        ModelAndView mav = null;
         Transaction tx = txSrv.findById(txId);
         String blockId = txSrv.findBlockIdById(txId);
+        if (tx.getContent().getContentType().equals(Record.class.getSimpleName())) {
+            mav = new ModelAndView("transaction/show_record");
+        } else if (tx.getContent().getContentType().equals(TxString.class.getSimpleName())) {
+            mav = new ModelAndView("transaction/show_string");
+        } else {
+            mav = new ModelAndView("transaction/error");
+        }
+
         mav.addObject("tx", tx);
         mav.addObject("blockId", blockId);
         return mav;
