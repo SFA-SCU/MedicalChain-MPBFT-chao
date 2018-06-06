@@ -1,5 +1,6 @@
 package com.pancake.util;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.WriteConcern;
@@ -14,10 +15,7 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Sorts.ascending;
@@ -92,6 +90,22 @@ public class MongoDB {
         options.writeConcern(WriteConcern.ACKNOWLEDGED);//
         options.build();
         mongoDatabase = mongoClient.getDatabase(database);
+    }
+
+    public List<String> findByKVs(Map<String, Object> kvMap, String collectionName) {
+        MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+        List<String> result = new ArrayList<String>();
+        Document doc = new Document();
+
+        for (Map.Entry<String, Object> entry : kvMap.entrySet()) {
+            doc.put(entry.getKey(), entry.getValue());
+        }
+
+        for (Document document : collection.find(doc)) {
+            result.add(document.toJson());
+        }
+        return result;
+
     }
 
     @SuppressWarnings("Duplicates")

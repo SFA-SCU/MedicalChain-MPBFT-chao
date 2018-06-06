@@ -74,13 +74,16 @@
                 </div>
                 <div class="col-md-10 column">
                     <h2>
-                        信息
+                        删除交易单信息
                     </h2>
                     <br>
                     <form action="${pageContext.request.contextPath}/record/save" method="post">
                         <table class="table table-bordered">
                             <tr>
                                 <th>
+                                    <c:if test="${delTxId != null}">
+                                        <span class="label label-danger">已删除</span>
+                                    </c:if>
                                     <span>交易单ID：</span>
                                 </th>
                                 <td>
@@ -88,6 +91,17 @@
                                            readonly="readonly">
                                 </td>
                             </tr>
+                            <c:if test="${delTxId != null}">
+                                <tr>
+                                    <th>
+                                        <span>删除交易单ID:</span>
+                                    </th>
+                                    <td>
+                                        <input type="text" class="form-control" name="delTxId" value="${delTxId}"
+                                               readonly="readonly">
+                                    </td>
+                                </tr>
+                            </c:if>
                             <tr>
                                 <th>
                                     <span>所在区块ID：</span>
@@ -138,20 +152,15 @@
 
                             <tr>
                                 <th>
-                                    <span>内容：</span>
+                                    <span>被删除的交易单ID：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.content.string}"
+                                    <input type="text" class="form-control" name="id" value="${tx.content.txId}"
                                            readonly="readonly">
                                 </td>
                             </tr>
 
                         </table>
-                        <div style="text-align: center">
-                            <button type="submit" class="btn btn-primary btn-lg">修改</button>
-                            &nbsp;
-                            <button type="submit" class="btn btn-primary btn-lg btn-danger">删除</button>
-                        </div>
                     </form>
 
 

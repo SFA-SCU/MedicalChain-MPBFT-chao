@@ -46,7 +46,8 @@
                     <br>
                     <ul class="nav nav-stacked nav-pills">
                         <li>
-                            <a href="${pageContext.request.contextPath}/tx/index"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">首页</span></a>
+                            <a href="${pageContext.request.contextPath}/tx/index"><span
+                                    style="color: #dbdbdb; font-size: 20px; font-weight: bold">首页</span></a>
                         </li>
                         <!--
                         <li class="dropdown pull-right">
@@ -76,23 +77,39 @@
                         传染病信息
                     </h2>
                     <br>
-                    <form action="${pageContext.request.contextPath}/record/save" method="post">
+                    <form id="tx_form" action="${pageContext.request.contextPath}/record/save" method="post">
                         <table class="table table-bordered">
                             <tr>
                                 <th>
+                                    <c:if test="${delTxId != null}">
+                                        <span class="label label-danger">已删除</span>
+                                    </c:if>
                                     <span>交易单ID：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.txId}" readonly="readonly">
+                                    <input type="text" class="form-control" name="txId" value="${tx.txId}"
+                                           readonly="readonly">
                                 </td>
                             </tr>
+                            <c:if test="${delTxId != null}">
+                                <tr>
+                                    <th>
+                                        <span>删除交易单ID:</span>
+                                    </th>
+                                    <td>
+                                        <input type="text" class="form-control" name="delTxId" value="${delTxId}"
+                                               readonly="readonly">
+                                    </td>
+                                </tr>
+                            </c:if>
                             <tr>
                                 <th>
                                     <span>所在区块ID：</span>
                                 </th>
                                 <td>
                                     <a href="${pageContext.request.contextPath}/block/search?blockId=${blockId}">
-                                        <input type="text" class="form-control" name="id" value="${blockId}" readonly="readonly">
+                                        <input type="text" class="form-control" name="blockId" value="${blockId}"
+                                               readonly="readonly">
                                     </a>
                                 </td>
                             </tr>
@@ -101,7 +118,8 @@
                                     <span>数字签名：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.signature}" readonly="readonly">
+                                    <input type="text" class="form-control" name="signature" value="${tx.signature}"
+                                           readonly="readonly">
                                 </td>
                             </tr>
                             <tr>
@@ -109,7 +127,8 @@
                                     <span>交易单类型：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.txType}" readonly="readonly">
+                                    <input type="text" class="form-control" name="txType" value="${tx.txType}"
+                                           readonly="readonly">
                                 </td>
                             </tr>
                             <tr>
@@ -117,7 +136,8 @@
                                     <span>公钥：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.pubKey}" readonly="readonly">
+                                    <input type="text" class="form-control" name="pubKey" value="${tx.pubKey}"
+                                           readonly="readonly">
                                 </td>
                             </tr>
                             <tr>
@@ -125,7 +145,8 @@
                                     <span>时间戳：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.timestamp}" readonly="readonly">
+                                    <input type="text" class="form-control" name="timestamp" value="${tx.timestamp}"
+                                           readonly="readonly">
                                 </td>
                             </tr>
                             <tr>
@@ -141,7 +162,8 @@
                                     <span>患者姓名：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="patientName" value="${tx.content.patientName}">
+                                    <input type="text" class="form-control" name="patientName"
+                                           value="${tx.content.patientName}">
                                 </td>
                             </tr>
                             <tr>
@@ -149,7 +171,8 @@
                                     <span>身份证号：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="patientId" value="${tx.content.patientId}">
+                                    <input type="text" class="form-control" name="patientId"
+                                           value="${tx.content.patientId}">
                                 </td>
                             </tr>
                             <tr>
@@ -157,7 +180,8 @@
                                     <span>诊断日期：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="diagnosisDate" value="${tx.content.diagnosisDate}">
+                                    <input type="text" class="form-control" name="diagnosisDate"
+                                           value="${tx.content.diagnosisDate}">
                                 </td>
                             </tr>
                             <tr>
@@ -165,7 +189,8 @@
                                     <span>传染病名称：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="infectionName" value="${tx.content.infectionName}">
+                                    <input type="text" class="form-control" name="infectionName"
+                                           value="${tx.content.infectionName}">
                                 </td>
                             </tr>
                             <tr>
@@ -173,13 +198,20 @@
                                     <span>报告单位：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="reportOrganization" value="${tx.content.reportOrganization}">
+                                    <input type="text" class="form-control" name="reportOrganization"
+                                           value="${tx.content.reportOrganization}">
                                 </td>
                             </tr>
                         </table>
-                        <button type="submit" class="btn btn-primary btn-lg">提交修改</button>
                     </form>
-
+                    <form id="tx_id_form" action="${pageContext.request.contextPath}/tx/delete" method="post">
+                        <input type="hidden" class="form-control" name="txId" value="${tx.txId}">
+                    </form>
+                    <div style="text-align: center">
+                        <button type="submit" form="tx_form" class="btn btn-primary btn-lg">修改</button>
+                        &nbsp;
+                        <button type="submit" form="tx_id_form" class="btn btn-primary btn-lg btn-danger">删除</button>
+                    </div>
 
                 </div>
             </div>

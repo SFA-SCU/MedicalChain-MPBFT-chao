@@ -6,6 +6,7 @@ import com.pancake.dao.TransactionDao;
 import com.pancake.entity.component.Block;
 import com.pancake.entity.component.Transaction;
 import com.pancake.entity.content.TxContent;
+import com.pancake.entity.enumeration.TxType;
 import com.pancake.entity.pojo.MongoDBConfig;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
@@ -16,7 +17,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -36,6 +39,46 @@ public class TransactionService {
 
     public static TransactionService getInstance() {
         return LazyHolder.INSTANCE;
+    }
+
+    /**
+     * 到配置文件中的mongodb查询主节点中的 tx 是否被删除了
+     * @param txId
+     * @return
+     */
+    public String isDeleted(String txId) {
+        return this.isDeleted(txId, JsonUtil.getMongoDBConfig(Const.BlockChainConfigFile), NetUtil.getPrimaryNode());
+    }
+
+    /**
+     * 查看id 为 txId 的交易单是否被删除了，若是，返回删除该交易单的交易单的ID
+     * @param txId
+     * @param mongoDBConfig
+     * @param netAddress
+     * @return
+     */
+    public String isDeleted(String txId, MongoDBConfig mongoDBConfig, NetAddress netAddress) {
+        MongoDB mongoDB = new MongoDB(mongoDBConfig);
+        String txCollection = netAddress + "." + Const.TX;
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("txType", TxType.DELETE.getName());
+        map.put("content.txId", txId);
+
+        List<String> list = mongoDB.findByKVs(map, txCollection);
+
+        if (list == null || list.size() == 0) {
+            return null;
+        } else {
+            String delTxId = null;
+            try {
+                delTxId = objectMapper.readValue(list.get(list.size()-1), Transaction.class).getTxId();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return delTxId;
+        }
+
     }
 
     /**
