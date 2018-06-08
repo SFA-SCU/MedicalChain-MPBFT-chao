@@ -141,8 +141,7 @@
                                     <span>内容：</span>
                                 </th>
                                 <td>
-                                    <input type="text" class="form-control" name="id" value="${tx.content.string}"
-                                           readonly="readonly">
+                                    <input type="text" class="form-control" name="id" value="${tx.content.string}">
                                 </td>
                             </tr>
 

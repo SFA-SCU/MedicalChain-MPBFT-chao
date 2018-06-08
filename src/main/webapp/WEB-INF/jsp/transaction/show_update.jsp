@@ -46,13 +46,8 @@
                     <br>
                     <ul class="nav nav-stacked nav-pills">
                         <li>
-                            <a href="/"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">简介</span></a>
-                        </li>
-                        <li>
-                            <a href="manage"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">管理</span></a>
-                        </li>
-                        <li>
-                            <a href="#"><span style="color: #dbdbdb; font-size: 20px; font-weight: bold">信息</span></a>
+                            <a href="${pageContext.request.contextPath}/tx/index"><span
+                                    style="color: #dbdbdb; font-size: 20px; font-weight: bold">首页</span></a>
                         </li>
                         <!--
                         <li class="dropdown pull-right">
@@ -79,65 +74,105 @@
                 </div>
                 <div class="col-md-10 column">
                     <h2>
-                        添加传染病信息
+                        更新交易单信息
                     </h2>
                     <br>
                     <form action="${pageContext.request.contextPath}/record/save" method="post">
-                    <table class="table table-bordered">
-                        <tr>
-                            <th>
-                                <span>报告卡编号：</span>
-                            </th>
-                            <td>
-                                <input type="text" class="form-control" name="id">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>
-                                <span>患者姓名：</span>
-                            </th>
-                            <td>
-                                <input type="text" class="form-control" name="patientName">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>
-                                <span>身份证号：</span>
-                            </th>
-                            <td>
-                                <input type="text" class="form-control" name="patientId">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>
-                                <span>诊断日期：</span>
-                            </th>
-                            <td>
-                                <input type="text" class="form-control" name="diagnosisDate">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>
-                                <span>传染病名称：</span>
-                            </th>
-                            <td>
-                                <input type="text" class="form-control" name="infectionName">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>
-                                <span>报告单位：</span>
-                            </th>
-                            <td>
-                                <input type="text" class="form-control" name="reportOrganization">
-                            </td>
-                        </tr>
-                    </table>
-                        <button type="submit" class="btn btn-primary btn-lg">提交</button>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>
+                                    <c:if test="${delTxId != null}">
+                                        <span class="label label-danger">已删除</span>
+                                    </c:if>
+                                    <span>交易单ID：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${tx.txId}"
+                                           readonly="readonly">
+                                </td>
+                            </tr>
+                            <c:if test="${delTxId != null}">
+                                <tr>
+                                    <th>
+                                        <span>删除交易单ID:</span>
+                                    </th>
+                                    <td>
+                                        <input type="text" class="form-control" name="delTxId" value="${delTxId}"
+                                               readonly="readonly">
+                                    </td>
+                                </tr>
+                            </c:if>
+                            <tr>
+                                <th>
+                                    <span>所在区块ID：</span>
+                                </th>
+                                <td>
+                                    <a href="${pageContext.request.contextPath}/block/search?blockId=${blockId}">
+                                        <input type="text" class="form-control" name="id" value="${blockId}"
+                                               readonly="readonly">
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>数字签名：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${tx.signature}"
+                                           readonly="readonly">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>交易单类型：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${tx.txType}"
+                                           readonly="readonly">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>公钥：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${tx.pubKey}"
+                                           readonly="readonly">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <span>时间戳：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${tx.timestamp}"
+                                           readonly="readonly">
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>
+                                    <span>被修改的交易单ID：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${tx.content.oldTxId}"
+                                           readonly="readonly">
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>
+                                    <span>修改后的交易单ID：</span>
+                                </th>
+                                <td>
+                                    <input type="text" class="form-control" name="id" value="${tx.content.newTxId}"
+                                           readonly="readonly">
+                                </td>
+                            </tr>
+
+                        </table>
                     </form>
-                <c:if test = "${txId != null}">
-                    <span>提交成功，生成交易单 ID 为：<span style="color: #F00056">${txId}</span></span>
-                </c:if>
+
 
                 </div>
             </div>
@@ -152,8 +187,8 @@
 
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
-                        <li class="active">
-                            <a href="/">首页</a>
+                        <li>
+                            <a href="${pageContext.request.contextPath}/">首页</a>
                         </li>
                         <li>
                             <a href="${pageContext.request.contextPath}/block/blockchain">区块链</a>
@@ -161,16 +196,17 @@
                         <li>
                             <a href="${pageContext.request.contextPath}/block/index">区块</a>
                         </li>
-                        <li>
+                        <li class="active">
                             <a href="${pageContext.request.contextPath}/tx/index">交易单</a>
                         </li>
                         <li>
                             <a href="${pageContext.request.contextPath}/node/show">节点</a>
                         </li>
                     </ul>
-                    <form class="navbar-form navbar-left" role="search" action="${pageContext.request.contextPath}/tx/search">
+                    <form class="navbar-form navbar-left" role="search"
+                          action="${pageContext.request.contextPath}/tx/search">
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="交易单ID"  name="txId"/>
+                            <input type="text" class="form-control" placeholder="交易单ID" name="txId"/>
                         </div>
                         <button type="submit" class="btn btn-default">搜索</button>
                     </form>

@@ -141,7 +141,7 @@
                                 <td>
                                     <input type="text" class="form-control" name="id" value="${txId}">
                                 </td>
-                                <c:set var="index" value="${index} + 1"/>
+                                <c:set var="index" value="${index + 1}"/>
                             </tr>
                             </c:forEach>
 

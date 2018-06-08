@@ -77,7 +77,7 @@
                         传染病信息
                     </h2>
                     <br>
-                    <form id="tx_form" action="${pageContext.request.contextPath}/record/save" method="post">
+                    <form id="tx_form" action="${pageContext.request.contextPath}/tx/update" method="post">
                         <table class="table table-bordered">
                             <tr>
                                 <th>
@@ -155,6 +155,13 @@
                                 </th>
                                 <td>
                                     <input type="text" class="form-control" name="id" value="${tx.content.id}">
+                                    <c:if test="${oldTx!=null and tx.content.id != oldTx.content.id}">
+                                        <span class="label label-warning">已修改</span>
+                                        <span><a href="${pageContext.request.contextPath}/tx/search?txId=${oldTx.txId}">
+                                            原交易为:${oldTx.txId}</a></span> <br>
+                                        <span><a href="${pageContext.request.contextPath}/tx/search?txId=${updateTx.txId}">
+                                            update 交易单为：${updateTx.txId}</a></span>
+                                    </c:if>
                                 </td>
                             </tr>
                             <tr>
@@ -164,6 +171,13 @@
                                 <td>
                                     <input type="text" class="form-control" name="patientName"
                                            value="${tx.content.patientName}">
+                                    <c:if test="${oldTx!=null and tx.content.patientName != oldTx.content.patientName}">
+                                        <span class="label label-warning">已修改</span>
+                                        <span><a href="${pageContext.request.contextPath}/tx/search?txId=${oldTx.txId}">
+                                            原交易为:${oldTx.txId}</a></span> <br>
+                                        <span><a href="${pageContext.request.contextPath}/tx/search?txId=${updateTx.txId}">
+                                            update 交易单为：${updateTx.txId}</a></span>
+                                    </c:if>
                                 </td>
                             </tr>
                             <tr>
@@ -173,6 +187,13 @@
                                 <td>
                                     <input type="text" class="form-control" name="patientId"
                                            value="${tx.content.patientId}">
+                                    <c:if test="${oldTx!=null and tx.content.patientId != oldTx.content.patientId}">
+                                        <span class="label label-warning">已修改</span>
+                                        <span><a href="${pageContext.request.contextPath}/tx/search?txId=${oldTx.txId}">
+                                            原交易为:${oldTx.txId}</a></span> <br>
+                                        <span><a href="${pageContext.request.contextPath}/tx/search?txId=${updateTx.txId}">
+                                            update 交易单为：${updateTx.txId}</a></span>
+                                    </c:if>
                                 </td>
                             </tr>
                             <tr>
@@ -182,6 +203,13 @@
                                 <td>
                                     <input type="text" class="form-control" name="diagnosisDate"
                                            value="${tx.content.diagnosisDate}">
+                                    <c:if test="${oldTx!=null and tx.content.diagnosisDate != oldTx.content.diagnosisDate}">
+                                        <span class="label label-warning">已修改</span>
+                                        <span><a href="${pageContext.request.contextPath}/tx/search?txId=${oldTx.txId}">
+                                            原交易为:${oldTx.txId}</a></span> <br>
+                                        <span><a href="${pageContext.request.contextPath}/tx/search?txId=${updateTx.txId}">
+                                            update 交易单为：${updateTx.txId}</a></span>
+                                    </c:if>
                                 </td>
                             </tr>
                             <tr>
@@ -191,6 +219,13 @@
                                 <td>
                                     <input type="text" class="form-control" name="infectionName"
                                            value="${tx.content.infectionName}">
+                                    <c:if test="${oldTx!=null and tx.content.infectionName != oldTx.content.infectionName}">
+                                        <span class="label label-warning">已修改</span>
+                                        <span><a href="${pageContext.request.contextPath}/tx/search?txId=${oldTx.txId}">
+                                            原交易为:${oldTx.txId}</a></span> <br>
+                                        <span><a href="${pageContext.request.contextPath}/tx/search?txId=${updateTx.txId}">
+                                            update 交易单为：${updateTx.txId}</a></span>
+                                    </c:if>
                                 </td>
                             </tr>
                             <tr>
@@ -200,6 +235,14 @@
                                 <td>
                                     <input type="text" class="form-control" name="reportOrganization"
                                            value="${tx.content.reportOrganization}">
+                                    <c:if test="${oldTx!=null and tx.content.reportOrganization != oldTx.content.reportOrganization}">
+                                        <span class="label label-warning">已修改</span>
+                                        <span><a href="${pageContext.request.contextPath}/tx/search?txId=${oldTx.txId}">
+                                            原交易为:${oldTx.txId}</a></span>
+                                        <br>
+                                        <span><a href="${pageContext.request.contextPath}/tx/search?txId=${updateTx.txId}">
+                                            update 交易单为：${updateTx.txId}</a></span>
+                                    </c:if>
                                 </td>
                             </tr>
                         </table>

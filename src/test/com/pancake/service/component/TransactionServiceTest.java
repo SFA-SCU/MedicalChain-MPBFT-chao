@@ -1,6 +1,9 @@
 package com.pancake.service.component;
 
 import com.pancake.entity.component.Transaction;
+import com.pancake.entity.content.TxDelete;
+import com.pancake.entity.content.TxString;
+import com.pancake.entity.enumeration.TxType;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -26,6 +29,12 @@ public class TransactionServiceTest {
     public void findBlockIdById() {
         String blockId = txSrv.findBlockIdById("G2Mj0xM6c+ZOw7j50Y7tdgKd396x+BSBznhuGump9bk=");
         System.out.println(blockId);
+    }
+
+    @Test
+    public void save() {
+        TxDelete txString = new TxDelete("123");
+        txSrv.save(txString, TxType.INSERT);
     }
 
 }

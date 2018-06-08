@@ -29,6 +29,7 @@ public class TransactionService {
     private final static Logger logger = LoggerFactory.getLogger(TransactionService.class);
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private TransactionDao txDao = TransactionDao.getInstance();
+    private RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_QUEUE, Const.BlockChainConfigFile);
 
     private static class LazyHolder {
         private static final TransactionService INSTANCE = new TransactionService();
@@ -39,6 +40,37 @@ public class TransactionService {
 
     public static TransactionService getInstance() {
         return LazyHolder.INSTANCE;
+    }
+
+    /**
+     * 根据 txContent 生成交易单，并将交易单存储在区块中
+     * @param txContent
+     * @return 返回交易单ID
+     */
+    public Transaction save(TxContent txContent, TxType txType) {
+        // 若 txContent 的类型没有设置，则设为类名
+        if(txContent.getContentType() == null || txContent.getContentType().trim().equals("")) {
+            txContent.setContentType(txContent.getClass().getSimpleName());
+        }
+
+        Transaction tx = null;
+        try {
+            tx = this.genTx(txType.getName(), txContent);
+            logger.info("生成交易单: " + tx.getTxId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (tx != null) {
+            rmq.push(tx.toString());
+        } else {
+            logger.error("tx 为 null");
+        }
+
+        if(tx == null) {
+            return null;
+        }
+        return tx;
     }
 
     /**
@@ -61,6 +93,7 @@ public class TransactionService {
         MongoDB mongoDB = new MongoDB(mongoDBConfig);
         String txCollection = netAddress + "." + Const.TX;
 
+        // 查询条件
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("txType", TxType.DELETE.getName());
         map.put("content.txId", txId);
@@ -79,6 +112,46 @@ public class TransactionService {
             return delTxId;
         }
 
+    }
+
+    /**
+     * 判断 tx 是否为被修改过的 tx
+     * @param txId
+     * @return
+     */
+    public Transaction isUpdated(String txId) {
+        return this.isUpdated(txId, JsonUtil.getMongoDBConfig(Const.BlockChainConfigFile), NetUtil.getPrimaryNode());
+    }
+
+    /**
+     * 判断 tx 是否为被修改过的 tx
+     * @param txId
+     * @param mongoDBConfig
+     * @param netAddress
+     * @return
+     */
+    public Transaction isUpdated(String txId, MongoDBConfig mongoDBConfig, NetAddress netAddress) {
+        MongoDB mongoDB = new MongoDB(mongoDBConfig);
+        String txCollection = netAddress + "." + Const.TX;
+
+        // 查询条件
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("txType", TxType.UPDATE.getName());
+        map.put("content.newTxId", txId);
+
+        List<String> list = mongoDB.findByKVs(map, txCollection);
+
+        if (list == null || list.size() == 0) {
+            return null;
+        } else {
+            Transaction updatedTx = null;
+            try {
+                updatedTx = objectMapper.readValue(list.get(list.size()-1), Transaction.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return updatedTx;
+        }
     }
 
     /**
@@ -159,8 +232,14 @@ public class TransactionService {
             }
             return block ;
         } else {
+            Block block = null;
+            try {
+                block  = objectMapper.readValue(list.get(list.size()-1), Block.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             logger.error("id 为： " + txId + " 的block记录存在多条");
-            return null;
+            return block ;
         }
     }
 

@@ -16,7 +16,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = Record.class, name = "Record"),
         @JsonSubTypes.Type(value = TxString.class, name = "TxString"),
-        @JsonSubTypes.Type(value = TxDelete.class, name = "TxDelete")})
+        @JsonSubTypes.Type(value = TxDelete.class, name = "TxDelete"),
+        @JsonSubTypes.Type(value = TxUpdate.class, name = "TxUpdate")})
 public class TxContent {
     private String contentType;
 
