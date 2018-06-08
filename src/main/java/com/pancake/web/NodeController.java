@@ -25,9 +25,11 @@ public class NodeController {
         ModelAndView mav = new ModelAndView("/node_html/show");
         Map<NetAddress, Boolean> validatorsStatus = nodeService.validatorsStatus();
         Map<NetAddress, Boolean> blockersStatus = nodeService.blockersStatus();
+        Map<NetAddress, Boolean> rabbitStatus = nodeService.txTransStatus();
 
         mav.addObject("validatorsStatus", validatorsStatus);
         mav.addObject("blockersStatus", blockersStatus);
+        mav.addObject("rabbitStatus", rabbitStatus);
         return mav;
     }
 }

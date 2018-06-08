@@ -1,6 +1,7 @@
 package com.pancake.service.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pancake.entity.pojo.RabbitmqServer;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
 import com.pancake.util.JsonUtil;
@@ -82,5 +83,18 @@ public class NodeService {
     public Map<NetAddress, Boolean> blockersStatus() {
         List<NetAddress> netAddresses = JsonUtil.getBlockerAddressList();
         return nodesStatus(netAddresses);
+    }
+
+    /**
+     * 获取 Transaction Transmitter 的可连信息
+     * @return
+     */
+    public Map<NetAddress, Boolean> txTransStatus() {
+        RabbitmqServer rabbitmqServer = JsonUtil.getRabbitmqServer();
+        NetAddress netAddress = new NetAddress(rabbitmqServer.getIp(), rabbitmqServer.getPort());
+        Map<NetAddress, Boolean> map =
+                new LinkedHashMap<NetAddress, Boolean>();
+        map.put(netAddress, this.isHostConnectable(netAddress));
+        return map;
     }
 }

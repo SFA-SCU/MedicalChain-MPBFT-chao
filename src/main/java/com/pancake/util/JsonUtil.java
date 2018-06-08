@@ -174,6 +174,9 @@ public class JsonUtil {
         return new NetAddress((String)pubMap.get("ip"), (Integer) pubMap.get("port"));
     }
 
+    public static RabbitmqServer getRabbitmqServer() {
+        return getRabbitmqServer(Const.BlockChainConfigFile);
+    }
     /**
      * 从 jsonFile 中获取 Rabbitmq 的配置信息
      * @param jsonFile

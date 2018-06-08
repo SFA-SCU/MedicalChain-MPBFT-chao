@@ -91,6 +91,11 @@
                     </table>
                     </form>
 
+                    <button type="submit" class="btn btn-default">清空数据</button>
+                    <br><br>
+                    <form action="${pageContext.request.contextPath}/block/genesis" method="get">
+                        <button type="submit" class="btn btn-default">发送创世区块</button>
+                    </form>
                 </div>
             </div>
             <nav class="navbar navbar-default navbar-fixed-top" role="navigation">

@@ -80,6 +80,32 @@
                     <table class="table table-bordered">
                         <tr>
                             <th colspan="2">
+                                <span>Transaction Transmitter</span>
+                            </th>
+                        </tr>
+                        <c:set var="index" value="1"/>
+                        <c:forEach items="${rabbitStatus}" var="rabbitsStatus">
+                            <tr>
+                                <th>
+                                    <p>Rabbitmq${index} [ ${rabbitsStatus.key.ip}:${rabbitsStatus.key.port} ]</p>
+                                </th>
+                                <td>
+                                    <c:if test="${rabbitsStatus.value == true}">
+                                        <h4><span class="label label-success">在线</span></h4>
+                                    </c:if>
+                                    <c:if test="${rabbitsStatus.value == false}">
+                                        <h4><span class="label label-danger">离线</span></h4>
+                                    </c:if>
+
+                                </td>
+                                <c:set var="index" value="${index + 1}"/>
+                            </tr>
+                        </c:forEach>
+                    </table>
+                    <br>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th colspan="2">
                                 <span>验证器（Validator）</span>
                             </th>
                         </tr>
