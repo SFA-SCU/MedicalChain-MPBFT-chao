@@ -227,6 +227,30 @@ public class JsonUtil {
     }
 
     /**
+     * 从配置文件中获取block的大小
+     * @param jsonFile
+     * @return
+     */
+    public static double getBlockSize(String jsonFile) {
+        String jsonStr = getStrByJsonFile(jsonFile);
+        Map map = jsonToMap(jsonStr);
+        Map blockMap = (HashMap) map.get("block");
+        return (Double)blockMap.get("size");
+    }
+
+    /**
+     * 从配置文件中获取生成block的最长时间间隔
+     * @param jsonFile
+     * @return
+     */
+    public static long getTimeInterval(String jsonFile) {
+        String jsonStr = getStrByJsonFile(jsonFile);
+        Map map = jsonToMap(jsonStr);
+        Map blockMap = (HashMap) map.get("block");
+        return Long.valueOf((Integer)blockMap.get("time_interval"));
+    }
+
+    /**
      * 获取 Publisher 的地址
      * @param jsonFile
      * @return

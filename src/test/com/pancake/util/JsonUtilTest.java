@@ -24,4 +24,12 @@ public class JsonUtilTest {
     public void getValidatorMongoAddr() {
         System.out.println(JsonUtil.getValidatorMongoAddr(Const.BlockChainConfigFile));
     }
+    @Test
+    public void testBlockSize() {
+        System.out.println(JsonUtil.getBlockSize(Const.BlockChainConfigFile));
+    }
+    @Test
+    public void testTimeInterval() {
+        System.out.println(JsonUtil.getTimeInterval(Const.BlockChainConfigFile));
+    }
 }

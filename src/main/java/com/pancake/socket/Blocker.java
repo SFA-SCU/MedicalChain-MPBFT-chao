@@ -37,16 +37,23 @@ public class Blocker implements Runnable {
     private NetAddress netAddr; // Blocker 的网络地址
 
     public Blocker() {
-        this.timeInterval = 5000;
-        this.blockSize = Const.TX_ID_LIST_SIZE;
+//        this.timeInterval = 5000;
+//        this.blockSize = Const.TX_ID_LIST_SIZE;
+        this.init();
         this.timeout = 5000;
     }
 
     public Blocker(NetAddress netAddr) {
-        this.timeInterval = 5000;
-        this.blockSize = Const.TX_ID_LIST_SIZE;
+//        this.timeInterval = 5000;
+//        this.blockSize = Const.TX_ID_LIST_SIZE;
+        this.init();
         this.timeout = 5000;
         this.netAddr = netAddr;
+    }
+
+    public void init(){
+        this.timeInterval = JsonUtil.getTimeInterval(Const.BlockChainConfigFile);
+        this.blockSize = JsonUtil.getBlockSize(Const.BlockChainConfigFile);
     }
 
     public void run() {

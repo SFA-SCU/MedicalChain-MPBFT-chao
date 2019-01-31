@@ -80,5 +80,10 @@
   "key_pair": {
     "pvt_key_file": "C:\\Users\\chao\\privateKey.txt",
     "pub_key_file": "C:\\Users\\chao\\publicKey.txt"
+  },
+
+  "block": {
+    "size": 2.0,
+    "time_interval": 5000
   }
 }

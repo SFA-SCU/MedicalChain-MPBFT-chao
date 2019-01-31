@@ -23,7 +23,7 @@ import java.util.List;
  */
 
 public class RunUtil {
-    private final static ObjectMapper objMapper = new ObjectMapper();
+    private final static ObjectMapper objectMapper = new ObjectMapper();
     private final static Logger logger = LoggerFactory.getLogger(RunUtil.class);
     private BlockService blockService = BlockService.getInstance();
     private BlockMessageService blockMsgServ = BlockMessageService.getInstance();
@@ -148,11 +148,13 @@ public class RunUtil {
         RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_QUEUE);
         List<Transaction> txList = new ArrayList<Transaction>();
         try {
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 1000; i++) {
                 Transaction tx = txService.genTx(TxType.INSERT.getName(), new TxString("测试" + i));
-//                if(i<4) {
+//                if(i % 100 != 0) {
 //                    txList.add(tx);
+//                    rmq.push(objectMapper.writeValueAsString(txList));
 //                }
+
                 rmq.push(tx.toString());
             }
 //            rmq.push(objectMapper.writeValueAsString(txList));
