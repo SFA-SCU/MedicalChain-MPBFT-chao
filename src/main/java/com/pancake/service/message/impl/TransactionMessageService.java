@@ -3,7 +3,7 @@ package com.pancake.service.message.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.dao.TransactionDao;
 import com.pancake.entity.component.Transaction;
-import com.pancake.entity.message.PrePrepareMessage;
+import com.pancake.entity.message.NewPrepareMessage;
 import com.pancake.entity.message.TransactionMessage;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
@@ -24,7 +24,6 @@ public class TransactionMessageService {
     private final static Logger logger = LoggerFactory.getLogger(TransactionMessageService.class);
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private TransactionDao txDao = TransactionDao.getInstance();
-    private NetService netService = NetService.getInstance();
 
     private static class LazyHolder {
         private static final TransactionMessageService INSTANCE = new TransactionMessageService();
@@ -37,39 +36,41 @@ public class TransactionMessageService {
     /**
      * 接收到 ClientMessage 为 TransactionMessage 时进行的一系列处理
      * @param rcvMsg
-     * @param validatorAddr
+     * @param validatorAddress
      */
-    public static void procTxMsg(String rcvMsg, NetAddress validatorAddr) {
-        String url = validatorAddr.toString();
+    public static void procTxMsg(String rcvMsg, NetAddress validatorAddress) {
+        String url = validatorAddress.toString();
         TransactionMessage txMsg = null;
         try {
             txMsg = objectMapper.readValue(rcvMsg, TransactionMessage.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("txMsg 解析失败，错误消息为：" + e.getMessage());
         }
+
         // 校验 Tx Msg
         if(txMsg != null && verify(txMsg)) {
-            // 1. 将从客户端收到的 Tx Message 存入到集合中
+            // 1. Tx Message 存入到集合中
+//            String txCollection = url + "." + Const.TXM;
             String txCollection = url + "." + Const.TXM;
             if(save(txMsg, txCollection)) {
                 logger.info("Tx Message: " + txMsg.getMsgId() + " 存入成功");
             } else {
-                logger.info("Tx Message: " + txMsg.getMsgId() + " 已存在");
+                logger.error("Tx Message: " + txMsg.getMsgId() + " 已存在");
             }
 
-            // 2. 从集合中取出给当前 PrePrepareMessage 分配的序列号
-            long seqNum = MessageService.updateSeqNum(url + ".seqNum");
-            // 3. 根据 Block Message 生成 PrePrepareMessage，存入到集合中
-            String ppmCollection = url + "." + Const.PPM;
+            // 2. 根据 Tx Message 生成 PrepareMessage，存入到集合中
+            String prepareMessageCollection = url + "." + Const.PM;
+//            String pmCollection = Const.PM;
 
-            PrePrepareMessage ppm = PrePrepareMessageService.genInstance(Long.toString(seqNum), txMsg);
-            PrePrepareMessageService.save(ppm, ppmCollection);
+            NewPrepareMessage prepareMessage = NewPrepareMessageService.genInstance(txMsg);
+            NewPrepareMessageService.save(prepareMessage, prepareMessageCollection);
 
-            // 4. 主节点向其他备份节点广播 PrePrepareMessage
+            // 4. 主节点向其他备份节点广播 PrepareMessage
             try {
-                NetService.broadcastMsg(validatorAddr.getIp(), validatorAddr.getPort(), objectMapper.writeValueAsString(ppm));
+                NetService.broadcastMsg(validatorAddress.getIp(), validatorAddress.getPort(),
+                        objectMapper.writeValueAsString(prepareMessage));
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("广播 PrepareMessage 失败，错误信息为：" + e.getMessage());
             }
         } else if(txMsg != null){
             logger.error("Tx Message: " + txMsg.getMsgId() + " 未通过校验");
@@ -117,12 +118,14 @@ public class TransactionMessageService {
      * @return
      */
     public static boolean save(TransactionMessage txMsg, String collectionName) {
-        if (MongoUtil.findByKV("msgId", txMsg.getMsgId(), collectionName)) {
-            logger.info("txMsg 消息 [" + txMsg.getMsgId() + "] 已存在");
-            return false;
-        } else {
-            MongoUtil.insertJson(txMsg.toString(), collectionName);
-            return true;
+        // 对先读再存方法加锁，防止出现一个线程读的同时另外一个线程改变
+        synchronized (TransactionMessageService.class) {
+            if (MongoUtil.findByKV("msgId", txMsg.getMsgId(), collectionName)) {
+                return false;
+            } else {
+                MongoUtil.insertJson(txMsg.toString(), collectionName);
+                return true;
+            }
         }
     }
 

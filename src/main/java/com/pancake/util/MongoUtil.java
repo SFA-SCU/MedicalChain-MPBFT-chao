@@ -391,6 +391,18 @@ public class MongoUtil {
     }
 
     /**
+     * 副本节点通过检查它们是否具有相同的视图，序列号和摘要来验证准备消息是否与预准备消息相匹配。
+     *
+     * @param prepareMessageId
+     * @param collectionName
+     * @return
+     */
+    public static int countPrepareMessageId(String prepareMessageId, String collectionName) {
+        // TODO
+        return 0;
+    }
+
+    /**
      * 根据 ppmSign, viewId, seqNum 在 pmCollection 中查找一个 PrepareMessage 或 CommittedMessage
      *
      * @param ppmSign
@@ -433,6 +445,26 @@ public class MongoUtil {
             logger.info("msgId 存在于集合：" + collectionName);
             ppmStr = findIterable.first().toJson();
             return objectMapper.readValue(ppmStr, PrePrepareMessage.class);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * 根据 PrepareMessage 的 id 查找 PrepareMessage，若存在则返回 PrepareMessage，否则就返回null
+     *
+     * @param prepareMessageId
+     * @param collectionName
+     * @return
+     */
+    public static NewPrepareMessage findPrepareMessageById(String prepareMessageId, String collectionName) throws IOException {
+        MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+        FindIterable<Document> findIterable = collection.find(eq("msgId", prepareMessageId));
+        String prepareMessageStr = null;
+        if (findIterable.iterator().hasNext()) {
+            logger.info("msgId 存在于集合：" + collectionName);
+            prepareMessageStr = findIterable.first().toJson();
+            return objectMapper.readValue(prepareMessageStr, NewPrepareMessage.class);
         } else {
             return null;
         }

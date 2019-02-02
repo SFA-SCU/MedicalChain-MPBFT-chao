@@ -1,0 +1,79 @@
+{
+  "current_validator": {
+    "ip": "127.0.0.1",
+    "port": 8000,
+    "mongo_ip": "127.0.0.1",
+    "mongo_port": 27017,
+    "mongo_user": "root",
+    "mongo_password": "zc-2668055"
+  },
+
+  "current_blocker": {
+    "ip": "127.0.0.1",
+    "port": 9000,
+    "mongo_ip": "127.0.0.1",
+    "mongo_port": 27017,
+    "mongo_user": "root",
+    "mongo_password": "zc-2668055"
+  },
+
+  "validators": [
+    {
+      "ip": "127.0.0.1",
+      "port": 8000
+    },
+    {
+      "ip": "127.0.0.1",
+      "port": 8001
+    },
+    {
+      "ip": "127.0.0.1",
+      "port": 8002
+    },
+    {
+      "ip": "127.0.0.1",
+      "port": 8003
+    }
+  ],
+  "blockers": [
+    {
+      "ip": "127.0.0.1",
+      "port": 9000
+    },
+    {
+      "ip": "127.0.0.1",
+      "port": 9001
+    },
+    {
+      "ip": "127.0.0.1",
+      "port": 9002
+    },
+    {
+      "ip": "127.0.0.1",
+      "port": 9003
+    }
+  ],
+
+  "rabbitmq": {
+    "userName": "admin",
+    "password": "admin",
+    "ip": "127.0.0.1",
+    "port":5672
+  },
+
+  "mongodb": {
+    "ip": "127.0.0.1",
+    "port": 27017,
+    "database": "BlockChain"
+  },
+
+  "key_pair": {
+    "pvt_key_file": "C:\\Users\\chao\\privateKey.txt",
+    "pub_key_file": "C:\\Users\\chao\\publicKey.txt"
+  },
+
+  "block": {
+    "size": 2.0,
+    "time_interval": 5000
+  }
+}
