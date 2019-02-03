@@ -361,32 +361,32 @@ public class MongoUtil {
         MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
         Iterator it = collection.find(eq("ppmSign", ppmSign)).iterator();
         int count = 0;
-        while (it.hasNext()) {
-
-            Document document = (Document) it.next();
-            String pmStr = document.toJson();
-            logger.debug("pmStr: " + pmStr);
-            Message msg = null;
-            try {
-                msg = objectMapper.readValue(pmStr, Message.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (msg != null && msg.getClass().getSimpleName().equals("PrepareMessage")) {
-                PrepareMessage pm = (PrepareMessage) msg;
-                if (pm.getViewId().equals(viewId) && pm.getSeqNum().equals(seqNum)) {
-                    count++;
-                }
-            } else if (msg != null && msg.getClass().getSimpleName().equals("CommitMessage")) {
-                CommitMessage cm = (CommitMessage) msg;
-                if (cm.getViewId().equals(viewId) && cm.getSeqNum().equals(seqNum)) {
-                    count++;
-                }
-            } else {
-                logger.info("message 类型不为 PrepareMessage 或 CommitMessage");
-            }
-
-        }
+//        while (it.hasNext()) {
+//
+//            Document document = (Document) it.next();
+//            String pmStr = document.toJson();
+//            logger.debug("pmStr: " + pmStr);
+//            Message msg = null;
+//            try {
+//                msg = objectMapper.readValue(pmStr, Message.class);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            if (msg != null && msg.getClass().getSimpleName().equals("PrepareMessage")) {
+//                PrepareMessage pm = (PrepareMessage) msg;
+//                if (pm.getViewId().equals(viewId) && pm.getSeqNum().equals(seqNum)) {
+//                    count++;
+//                }
+//            } else if (msg != null && msg.getClass().getSimpleName().equals("CommitMessage")) {
+//                CommitMessage cm = (CommitMessage) msg;
+//                if (cm.getViewId().equals(viewId) && cm.getSeqNum().equals(seqNum)) {
+//                    count++;
+//                }
+//            } else {
+//                logger.info("message 类型不为 PrepareMessage 或 CommitMessage");
+//            }
+//
+//        }
         return count;
     }
 
@@ -457,14 +457,14 @@ public class MongoUtil {
      * @param collectionName
      * @return
      */
-    public static NewPrepareMessage findPrepareMessageById(String prepareMessageId, String collectionName) throws IOException {
+    public static PrepareMessage findPrepareMessageById(String prepareMessageId, String collectionName) throws IOException {
         MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
         FindIterable<Document> findIterable = collection.find(eq("msgId", prepareMessageId));
         String prepareMessageStr = null;
         if (findIterable.iterator().hasNext()) {
             logger.info("msgId 存在于集合：" + collectionName);
             prepareMessageStr = findIterable.first().toJson();
-            return objectMapper.readValue(prepareMessageStr, NewPrepareMessage.class);
+            return objectMapper.readValue(prepareMessageStr, PrepareMessage.class);
         } else {
             return null;
         }

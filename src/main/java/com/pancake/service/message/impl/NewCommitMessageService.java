@@ -44,7 +44,7 @@ public class NewCommitMessageService {
             String commitMessageCollection = url + "." + Const.CMTM;
             String prepareMessageCollection = url + "." + Const.PM;
 
-            NewPrepareMessage prepareMessage = MongoUtil.findPrepareMessageById(commitMessage.getPrepareMessageId(),
+            PrepareMessage prepareMessage = MongoUtil.findPrepareMessageById(commitMessage.getPrepareMessageId(),
                     prepareMessageCollection);
             if (prepareMessage != null) {
                 // 1. 统计 PrepareMessageId 出现的次数

@@ -6,6 +6,11 @@ import org.junit.Test;
 
 public class JsonUtilTest {
     @Test
+    public void getTxTransmitterConfig() throws Exception {
+        System.out.println(JsonUtil.getTxTransmitterConfig(Const.BlockChainConfigFile));
+    }
+
+    @Test
     public void getMongoDBConfig() {
         System.out.println(JsonUtil.getMongoDBConfig(Const.BlockChainConfigFile));
     }

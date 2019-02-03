@@ -85,5 +85,10 @@
   "block": {
     "size": 2.0,
     "time_interval": 5000
+  },
+
+  "tx_transmitter": {
+    "limitTime": 200,
+    "limitSize": 2.0
   }
 }

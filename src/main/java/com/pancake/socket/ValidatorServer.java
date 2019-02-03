@@ -2,15 +2,14 @@ package com.pancake.socket;
 
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
-import com.pancake.handler.CommittedMsgHandler;
 import com.pancake.handler.ValidatorHandler;
-import com.pancake.handler.PreparedMsgHandler;
 import com.pancake.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -47,18 +46,16 @@ public class ValidatorServer implements Runnable {
     public void run() {
         try {
             String ip = validatorAddr.getIp();
-            logger.info("服务器 [" + ip + ":"
+            logger.info("Validator [" + ip + ":"
                     + serverSocket.getLocalPort() + "] 启动");
-            logger.info("服务器 [" + ip + ":"
-                    + serverSocket.getLocalPort() + "] 启动检测生成 PreparedMessage 服务器");
-            new Thread(new PreparedMsgHandler(validatorAddr)).start();
-            logger.info("服务器 [" + ip + ":"
-                    + serverSocket.getLocalPort() + "] 启动检测生成 CommittedMessage 服务器");
-            new Thread(new CommittedMsgHandler(validatorAddr)).start();
 
+            Socket socket = null;
             while (true) {
-                threadPool.execute(new ValidatorHandler(serverSocket.accept(), validatorAddr));
+                // 来自客户端的请求socket
+                socket = serverSocket.accept();
+                threadPool.execute(new ValidatorHandler(socket, validatorAddr));
             }
+
         } catch (IOException ex) {
             threadPool.shutdown();
         }

@@ -3,12 +3,15 @@ package com.pancake.service.message.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.dao.TransactionDao;
 import com.pancake.entity.component.Transaction;
-import com.pancake.entity.message.NewPrepareMessage;
+import com.pancake.entity.message.PrepareMessage;
 import com.pancake.entity.message.TransactionMessage;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
-import com.pancake.service.component.NetService;
-import com.pancake.util.*;
+import com.pancake.service.component.NewNetService;
+import com.pancake.util.MongoUtil;
+import com.pancake.util.RabbitmqUtil;
+import com.pancake.util.SignatureUtil;
+import com.pancake.util.TimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,21 +27,25 @@ public class TransactionMessageService {
     private final static Logger logger = LoggerFactory.getLogger(TransactionMessageService.class);
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private TransactionDao txDao = TransactionDao.getInstance();
+    private NewNetService netService = NewNetService.getInstance();
+    private PrepareMessageService prepareMessageService = PrepareMessageService.getInstance();
 
     private static class LazyHolder {
         private static final TransactionMessageService INSTANCE = new TransactionMessageService();
     }
-    private TransactionMessageService (){}
+    private TransactionMessageService() {
+    }
     public static TransactionMessageService getInstance() {
         return TransactionMessageService.LazyHolder.INSTANCE;
     }
 
     /**
      * 接收到 ClientMessage 为 TransactionMessage 时进行的一系列处理
+     *
      * @param rcvMsg
      * @param validatorAddress
      */
-    public static void procTxMsg(String rcvMsg, NetAddress validatorAddress) {
+    public void processTxMessage(String rcvMsg, NetAddress validatorAddress) {
         String url = validatorAddress.toString();
         TransactionMessage txMsg = null;
         try {
@@ -48,11 +55,11 @@ public class TransactionMessageService {
         }
 
         // 校验 Tx Msg
-        if(txMsg != null && verify(txMsg)) {
+        if (txMsg != null && verify(txMsg)) {
             // 1. Tx Message 存入到集合中
 //            String txCollection = url + "." + Const.TXM;
             String txCollection = url + "." + Const.TXM;
-            if(save(txMsg, txCollection)) {
+            if (this.save(txMsg, txCollection)) {
                 logger.info("Tx Message: " + txMsg.getMsgId() + " 存入成功");
             } else {
                 logger.error("Tx Message: " + txMsg.getMsgId() + " 已存在");
@@ -62,17 +69,17 @@ public class TransactionMessageService {
             String prepareMessageCollection = url + "." + Const.PM;
 //            String pmCollection = Const.PM;
 
-            NewPrepareMessage prepareMessage = NewPrepareMessageService.genInstance(txMsg);
-            NewPrepareMessageService.save(prepareMessage, prepareMessageCollection);
+            PrepareMessage prepareMessage = prepareMessageService.genInstance(txMsg);
+            prepareMessageService.save(prepareMessage, prepareMessageCollection);
 
             // 4. 主节点向其他备份节点广播 PrepareMessage
             try {
-                NetService.broadcastMsg(validatorAddress.getIp(), validatorAddress.getPort(),
+                netService.broadcastMsg(validatorAddress.getIp(), validatorAddress.getPort(),
                         objectMapper.writeValueAsString(prepareMessage));
             } catch (IOException e) {
                 logger.error("广播 PrepareMessage 失败，错误信息为：" + e.getMessage());
             }
-        } else if(txMsg != null){
+        } else if (txMsg != null) {
             logger.error("Tx Message: " + txMsg.getMsgId() + " 未通过校验");
         } else {
             logger.error("Tx Message 为空");
@@ -81,6 +88,7 @@ public class TransactionMessageService {
 
     /**
      * 根据 transaction 生成 message
+     *
      * @param txList
      * @return
      */
@@ -95,6 +103,7 @@ public class TransactionMessageService {
 
     /**
      * 从 tx list 中获取 tx，生成 TransactionMessage
+     *
      * @param queueName
      * @param limitTime
      * @param limitSize
@@ -117,7 +126,7 @@ public class TransactionMessageService {
      * @param collectionName
      * @return
      */
-    public static boolean save(TransactionMessage txMsg, String collectionName) {
+    public boolean save(TransactionMessage txMsg, String collectionName) {
         // 对先读再存方法加锁，防止出现一个线程读的同时另外一个线程改变
         synchronized (TransactionMessageService.class) {
             if (MongoUtil.findByKV("msgId", txMsg.getMsgId(), collectionName)) {
@@ -136,7 +145,7 @@ public class TransactionMessageService {
      * @param collectionName
      * @return
      */
-    public static boolean save(String blockMsgStr, String collectionName) {
+    public boolean save(String blockMsgStr, String collectionName) {
         TransactionMessage txMsg = null;
         try {
             txMsg = objectMapper.readValue(blockMsgStr, TransactionMessage.class);
@@ -148,22 +157,24 @@ public class TransactionMessageService {
 
     /**
      * 进行签名和验证的 content
+     *
      * @param txList
      * @param timestamp
      * @param pubKey
      * @return
      */
-    public static String getSignContent(List<Transaction> txList, String timestamp, String pubKey) {
+    public String getSignContent(List<Transaction> txList, String timestamp, String pubKey) {
         String msgType = Const.TXM;
-        return txList.toString() +msgType + timestamp + pubKey;
+        return txList.toString() + msgType + timestamp + pubKey;
     }
 
     /**
      * 校验数字签名
+     *
      * @param txMsg
      * @return
      */
-    public static boolean verify(TransactionMessage txMsg) {
+    public boolean verify(TransactionMessage txMsg) {
         return SignatureUtil.verify(txMsg.getPubKey(), getSignContent(txMsg.getTxList(), txMsg.getTimestamp(),
                 txMsg.getPubKey()), txMsg.getSignature());
     }

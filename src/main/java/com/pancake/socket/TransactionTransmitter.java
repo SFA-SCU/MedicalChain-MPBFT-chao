@@ -1,10 +1,12 @@
 package com.pancake.socket;
 
 import com.pancake.entity.component.Transaction;
+import com.pancake.entity.config.TxTransmitterConfig;
 import com.pancake.entity.util.Const;
 import com.pancake.service.component.NetService;
 import com.pancake.service.component.TransactionService;
 import com.pancake.service.message.impl.TransactionMessageService;
+import com.pancake.util.JsonUtil;
 import com.pancake.util.NetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +26,11 @@ public class TransactionTransmitter implements Runnable {
     private int timeout; // Blocker 连接 Validator 的超时时间
     private String primaryValidatorIP;
     private int primaryValidatorPort;
+    private double limitTime; // 单位毫秒
+    private double limitSize; // 单位 MB
 
     public TransactionTransmitter() {
+        this.init();
         this.timeInterval = 500;
         this.timeout = 5000;
         this.primaryValidatorIP = NetUtil.getPrimaryNode().getIp();
@@ -33,20 +38,27 @@ public class TransactionTransmitter implements Runnable {
     }
 
     public TransactionTransmitter(String primaryValidatorIP, int primaryValidatorPort) {
+        this.init();
         this.primaryValidatorIP = primaryValidatorIP;
         this.primaryValidatorPort = primaryValidatorPort;
     }
 
     public TransactionTransmitter(int timeout, String primaryValidatorIP, int primaryValidatorPort) {
+        this.init();
         this.timeout = timeout;
         this.primaryValidatorIP = primaryValidatorIP;
         this.primaryValidatorPort = primaryValidatorPort;
     }
 
+    private void init() {
+        TxTransmitterConfig config = JsonUtil.getTxTransmitterConfig(Const.BlockChainConfigFile);
+        this.limitTime = config.getLimitTime();
+        this.limitSize = config.getLimitSize();
+    }
+
     public void run() {
         String queueName = Const.TX_QUEUE;
-        double limitTime = 5000; // 单位毫秒
-        double limitSize = 20 / 1024.0; // 单位 MB
+
         List<Transaction> txList;
         while (true) {
             txList = txService.pullTxList(queueName, limitTime, limitSize);

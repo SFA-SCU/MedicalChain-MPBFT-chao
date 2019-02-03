@@ -32,6 +32,7 @@ public class CommittedMessageService {
     private LastBlockIdMessageService lbmService = LastBlockIdMessageService.getInstance();
     private TxIdMessageService timSrv = TxIdMessageService.getInstance();
     private NetService netService = NetService.getInstance();
+    private BlockMessageService blockMessageService = BlockMessageService.getInstance();
 
     private static class LazyHolder {
         private static final CommittedMessageService INSTANCE = new CommittedMessageService();
@@ -78,7 +79,7 @@ public class CommittedMessageService {
                         logger.info("Last block Id: " + blockId + " 更新成功");
 
                         // 验证成功的 block 发送到 Blocker 服务器上
-                        netService.sendMsg(BlockMessageService.genInstance(block).toString(), blockerAddr.getIp(),
+                        netService.sendMsg(blockMessageService.genInstance(block).toString(), blockerAddr.getIp(),
                                 blockerAddr.getPort());
 //                            new NettyClient(publisherAddr.getIp(), publisherAddr.getPort()).start(lbMsg.toString());
                     } else {

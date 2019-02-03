@@ -29,17 +29,13 @@ public class ValidatorsStarter {
 
         ThreadPoolExecutor es = (ThreadPoolExecutor) Executors.
                 newCachedThreadPool();
-        logger.info("availableProcessors: " + availableProcessors);
-        for (NetAddress va : netAddressList) {
+        for (NetAddress netAddress : netAddressList) {
             try {
-                logger.info("开始启动 Validator：" + va.toString());
-                es.execute(new ValidatorServer(va));
+                es.execute(new ValidatorServer(netAddress));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
-//        logger.info("验证节点终止运行");
     }
 
     public static void main(String[] args) {

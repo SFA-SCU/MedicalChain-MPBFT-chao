@@ -1,14 +1,12 @@
 package com.pancake.service.message.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pancake.entity.message.CommitMessage;
-import com.pancake.entity.message.PrePrepareMessage;
-import com.pancake.entity.message.PrepareMessage;
-import com.pancake.entity.message.PreparedMessage;
+import com.pancake.entity.message.*;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
-import com.pancake.service.component.NetService;
-import com.pancake.util.*;
+import com.pancake.util.MongoUtil;
+import com.pancake.util.SignatureUtil;
+import com.pancake.util.TimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,137 +15,119 @@ import java.security.PrivateKey;
 
 
 /**
- * Created by chao on 2017/12/18.
+ * Created by chao on 2017/12/10.
  */
 public class PrepareMessageService {
     private final static Logger logger = LoggerFactory.getLogger(PrepareMessageService.class);
     private final static ObjectMapper objectMapper = new ObjectMapper();
 
+    private static class LazyHolder {
+        private static final PrepareMessageService INSTANCE = new PrepareMessageService();
+    }
+    private PrepareMessageService() {
+    }
+    public static PrepareMessageService getInstance() {
+        return PrepareMessageService.LazyHolder.INSTANCE;
+    }
+
     /**
-     * 处理准备消息
-     * 只要准备消息的签名是正确的，它们的视图编号等于副本的当前视图，并且它们的序列号介于 h 和 H，
-     * 副本节点（包括主节点）便接受准备消息，并将它们添加到日志中。
+     * 处理接收到的预准备消息
      *
-     * @param rcvMsg
-     * @param validatorAddr
+     * @param receivedMessage
+     * @param validatorAddress
      * @return
+     * @throws IOException
      */
-    public static boolean procPMsg(String rcvMsg, NetAddress validatorAddr) throws IOException {
-        String url = validatorAddr.toString();
+    public boolean processPrepareMessage(String receivedMessage, NetAddress validatorAddress) throws IOException {
+        String url = validatorAddress.toString();
         logger.info("本机地址为：" + url);
 
         // 1. 校验接收到的 PrepareMessage
-        PrepareMessage pm = objectMapper.readValue(rcvMsg, PrepareMessage.class);
-        logger.info("接收到 PrepareMsg：" + rcvMsg);
-        logger.info("开始校验 PrepareMsg ...");
-        boolean verifyRes = PrepareMessageService.verify(pm);
-        logger.info("校验 PrepareMsg 结果为：" + verifyRes);
+        PrepareMessage prepareMessage = objectMapper.readValue(receivedMessage, PrepareMessage.class);
+        logger.info("接收到 PrepareMsg：" + prepareMessage.getMsgId());
+        logger.debug("开始校验 PrepareMsg ...");
+        boolean verifyResult = this.verify(prepareMessage);
+        logger.debug("校验结束，结果为：" + verifyResult);
 
-        if (verifyRes) {
-            String pmCollection = url + "." + Const.PM;
-            String ppmCollection = url + "." + Const.PPM;
-            String cmtmCollection = url + "." + Const.CMTM;
-            // 2.  PrepareMessage 存入前检验
-            PrePrepareMessage ppm = MongoUtil.findPPMById(SignatureUtil.getSha256Base64(pm.getPpmSign()), ppmCollection);
-
-            // 3. 将 PrePrepareMessage 存入到集合中
-            if (PrepareMessageService.save(pm, pmCollection)) {
-                logger.info("PrepareMessage [" + pm.getMsgId() + "] 存入数据库");
+        if (verifyResult) {
+            // 2. 校验结果为 true ，将 PrepareMessage 存入到集合中
+            String pareMessageCollection = url + "." + Const.PM;
+            if (this.save(prepareMessage, pareMessageCollection)) {
+                logger.debug("PrePrepareMessage [" + prepareMessage.getMsgId() + "] 已存入数据库");
             } else {
-                logger.info("PrepareMessage [" + pm.getMsgId() + "] 已存在");
+                logger.debug("PrePrepareMessage [" + prepareMessage.getMsgId() + "] 已存在");
             }
 
-            //  统计 ppmSign 出现的次数
-            int count = MongoUtil.countPPMSign(pm.getPpmSign(), pm.getViewId(), pm.getSeqNum(), pmCollection);
-            logger.debug("count = " + count);
-            // 4. 达成 count >= 2 * f 后存入到集合中
-            if (2 * PeerUtil.getFaultCount() + 1 <= count) {
-                logger.info("开始生成 PreparedMessage 并存入数据库");
-                String pdmCollection = url + "." + Const.PDM;
-                PreparedMessage pdm = PreparedMessageService.genInstance(ppm.getClientMsg().getMsgId(), ppm.getViewId(),
-                        ppm.getSeqNum(), validatorAddr.getIp(), validatorAddr.getPort());
-                if (PreparedMessageService.save(pdm, pdmCollection)) {
-                    logger.info("PreparedMessage [" + pdm.getMsgId() + "] 已存入数据库");
-                    CommitMessage cmtm = CommitMessageService.genCommitMsg(ppm.getSignature(), ppm.getViewId(),
-                            ppm.getSeqNum(), validatorAddr.getIp(), validatorAddr.getPort());
-                    logger.info("commit message: " + cmtm.toString());
-                    if (CommitMessageService.save(cmtm, cmtmCollection)) {
-                        logger.info("CommitMessage [" + cmtm.getMsgId() + "] 已存入数据库");
-                        NetService.broadcastMsg(validatorAddr.getIp(), validatorAddr.getPort(), cmtm.toString());
-                    } else {
-                        logger.info("CommitMessage [" + pdm.getMsgId() + "] 已存在");
-                    }
-                } else {
-                    logger.info("PreparedMessage [" + pdm.getMsgId() + "] 已存在");
-                }
+//            // 3. 生成 CommitMessage，存入集合，并向其他节点进行广播
+//            NewCommitMessage commitMessage = NewCommitMessageService.genInstance(prepareMessage.getMsgId(),
+//                    validatorAddress.getIp(), validatorAddress.getPort());
+//            String commitMessageCollection = url + "." + Const.CMTM;
+//            NewCommitMessageService.save(commitMessage, commitMessageCollection);
+//            logger.debug("CommitMessage [" + commitMessage.getMsgId() + "] 已存入数据库");
+//            NetService.broadcastMsg(validatorAddress.getIp(), validatorAddress.getPort(), commitMessage.toString());
+        }
+        return verifyResult;
+    }
+
+    @SuppressWarnings("Duplicates")
+    public boolean save(PrepareMessage prepareMessage, String collectionName) {
+        // TODO
+        synchronized (this) {
+            if (MongoUtil.findByKV("msgId", prepareMessage.getMsgId(), collectionName)) {
+                logger.error("prepareMessage: [" + prepareMessage.getMsgId() + "] 已存在");
+                return false;
             } else {
-                logger.info("Prepare Message 数量不够");
+                MongoUtil.insertJson(prepareMessage.toString(), collectionName);
+                return true;
             }
-
-            // 5. 生成 commit message 存入集合中，并广播给其他节点
-
-        }
-        return true;
-    }
-
-    /**
-     * 根据相关字段生成 PrepareMessage
-     *
-     * @param ppmSign ppm消息中的数字签名，相当于消息 m 的 digest d.
-     * @param viewId
-     * @param seqNum
-     * @param ip
-     * @param port
-     * @return
-     */
-    public static PrepareMessage genInstance(String ppmSign, String viewId, String seqNum, String ip, int port) {
-        String timestamp = TimeUtil.getNowTimeStamp();
-        PrivateKey privateKey = SignatureUtil.loadPvtKey("EC");
-        String pubKey = SignatureUtil.loadPubKeyStr("EC");
-        String signature = SignatureUtil.sign(privateKey, getSignContent(timestamp, pubKey, viewId, seqNum, ppmSign, ip, port));
-        String msgId = SignatureUtil.getSha256Base64(signature);
-        return new PrepareMessage(msgId, timestamp, pubKey, signature, viewId, seqNum, ppmSign, ip, port);
-
-    }
-
-    public static boolean verify(PrepareMessage pm) {
-        if (!SignatureUtil.verify(pm.getPubKey(), getSignContent(pm.getTimestamp(), pm.getPubKey(), pm.getViewId(),
-                pm.getSeqNum(), pm.getPpmSign(), pm.getIp(), pm.getPort()), pm.getSignature())) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * 根据传入的内容生成 pm 要签名的字符串
-     *
-     * @param ppmSign   ppm消息中的数字签名，相当于消息 m 的 digest d.
-     * @param viewId
-     * @param seqNum
-     * @param timestamp
-     * @return
-     */
-    public static String getSignContent(String timestamp, String pubKey, String viewId, String seqNum, String ppmSign, String ip, int port) {
-        return timestamp + pubKey + viewId + seqNum + ppmSign + ip + port;
-    }
-
-    public static boolean save(PrepareMessage pMsg, String collectionName) {
-        if (MongoUtil.findByKV("msgId", pMsg.getMsgId(), collectionName)) {
-            logger.info("pMsg 消息 [" + pMsg.getMsgId() + "] 已存在");
-            return false;
-        } else {
-            MongoUtil.insertJson(pMsg.toString(), collectionName);
-            return true;
         }
     }
 
-    public static boolean save(String pMsgStr, String collectionName) {
-        PrepareMessage pMsg = null;
+    public boolean save(String prepareMessageStr, String collectionName) {
+        PrepareMessage prepareMessage = null;
         try {
-            pMsg = objectMapper.readValue(pMsgStr, PrepareMessage.class);
+            prepareMessage = objectMapper.readValue(prepareMessageStr, PrepareMessage.class);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return save(pMsg, collectionName);
+        return save(prepareMessage, collectionName);
+    }
+
+    /**
+     * 根据 序列号 与 clientMsg 对象生成预准备消息对象
+     * @param clientMsg
+     * @return
+     */
+    public PrepareMessage genInstance(ClientMessage clientMsg) {
+        String timestamp = TimeUtil.getNowTimeStamp();
+        PrivateKey privateKey = SignatureUtil.loadPvtKey("EC");
+        String pubKey = SignatureUtil.loadPubKeyStr("EC");
+        String signature = SignatureUtil.sign(privateKey, getSignContent(clientMsg.getMsgId(), timestamp));
+        String msgId = SignatureUtil.getSha256Base64(signature);
+        return new PrepareMessage(msgId, timestamp, pubKey, signature, clientMsg);
+    }
+
+    /**
+     * 检验 PrepareMessage的正确性
+     *
+     * @param prepareMessage
+     * @return
+     */
+    public boolean verify(PrepareMessage prepareMessage) {
+        return SignatureUtil.verify(prepareMessage.getPubKey(), getSignContent(prepareMessage.getClientMsg().getMsgId(),
+                prepareMessage.getTimestamp()), prepareMessage.getSignature());
+    }
+
+    /**
+     * 根据传入的内容生成 prepareMessage 要签名的字符串
+     *
+     * @param clientMsgId
+     * @param timestamp
+     * @return
+     */
+    public String getSignContent(String clientMsgId, String timestamp) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(clientMsgId).append(timestamp);
+        return sb.toString();
     }
 }

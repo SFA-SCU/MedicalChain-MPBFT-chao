@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.pancake.entity.config.TxTransmitterConfig;
 import com.pancake.entity.pojo.MongoDBConfig;
 import com.pancake.entity.pojo.RabbitmqServer;
 import com.pancake.entity.util.Const;
@@ -59,7 +61,6 @@ public class JsonUtil {
         }
         return map;
     }
-
 
     /**
      * 从指定路径读取json文件，解析后返回json字符串
@@ -236,6 +237,13 @@ public class JsonUtil {
         Map map = jsonToMap(jsonStr);
         Map blockMap = (HashMap) map.get("block");
         return (Double)blockMap.get("size");
+    }
+
+    public static TxTransmitterConfig getTxTransmitterConfig(String jsonFile) {
+        String jsonStr = getStrByJsonFile(jsonFile);
+        Map map = jsonToMap(jsonStr);
+        Map tempMap = (HashMap) map.get("tx_transmitter");
+        return objMapper.convertValue(tempMap, TxTransmitterConfig.class);
     }
 
     /**

@@ -29,6 +29,7 @@ public class Blocker implements Runnable {
     private BlockerService blockerService = BlockerService.getInstance();
     private BlockService blockService = BlockService.getInstance();
     private NetService netService = NetService.getInstance();
+    private BlockMessageService blockMessageService = BlockMessageService.getInstance();
 
     private long timeInterval; //生成区块并发送的频率
     private double blockSize;
@@ -100,7 +101,7 @@ public class Blocker implements Runnable {
      */
     public void sendBlock(Block block, NetAddress netAddr) {
         logger.info("开始向 [" + netAddr.getIp() + ":" + netAddr.getPort() + "] 发送 block: " + block.getBlockId());
-        BlockMessage blockMessage = BlockMessageService.genInstance(block);
+        BlockMessage blockMessage = blockMessageService.genInstance(block);
         logger.info("blockMessage in send block: " + blockMessage);
         String rcvMsg = netService.sendMsg(blockMessage.toString(), netAddr.getIp(),
                 netAddr.getPort(), Const.TIME_OUT);

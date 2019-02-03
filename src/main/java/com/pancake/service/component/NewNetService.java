@@ -1,11 +1,11 @@
 package com.pancake.service.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
 import com.pancake.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.pancake.entity.util.Const;
 
 import java.io.*;
 import java.net.ConnectException;
@@ -17,18 +17,20 @@ import java.util.List;
 /**
  * Created by chao on 2017/12/18.
  */
-public class NetService {
-    private final static Logger logger = LoggerFactory.getLogger(NetService.class);
+public class NewNetService {
+    private final static Logger logger = LoggerFactory.getLogger(NewNetService.class);
     private final static ObjectMapper objectMapper = new ObjectMapper();
+    private final static List<NetAddress> validatorAddressList =
+            JsonUtil.getValidatorAddressList(Const.BlockChainConfigFile);
 
     private static class LazyHolder {
-        private static final NetService INSTANCE = new NetService();
+        private static final NewNetService INSTANCE = new NewNetService();
     }
 
-    private NetService() {
+    private NewNetService() {
     }
 
-    public static NetService getInstance() {
+    public static NewNetService getInstance() {
         return LazyHolder.INSTANCE;
     }
 
@@ -40,15 +42,16 @@ public class NetService {
      * @param msg
      * @throws IOException
      */
-    public static void broadcastMsg(String ip, int localPort, String msg) throws IOException {
-        List<NetAddress> list = JsonUtil.getValidatorAddressList(Const.BlockChainConfigFile);
-        for (NetAddress va : list) {
-            // 排除本机，向 BlockChainConfigFile 中存储的其他节点发送预准备消息
-            if (!((va.getIp().equals(ip) || va.getIp().equals("127.0.0.1")) && va.getPort() == localPort)) {
-                Socket broadcastSocket = new Socket(va.getIp(), va.getPort());
+    public void broadcastMsg(String ip, int localPort, String msg) throws IOException {
+//        List<NetAddress> list = JsonUtil.getValidatorAddressList(Const.BlockChainConfigFile);
+        for (NetAddress validatorAddres : validatorAddressList) {
+            // 排除本机，向 BlockChainConfigFile 中存储的其他验证节点发送预准备消息
+            if (!((validatorAddres.getIp().equals(ip) || validatorAddres.getIp().equals("127.0.0.1"))
+                    && validatorAddres.getPort() == localPort)) {
+                Socket broadcastSocket = new Socket(validatorAddres.getIp(), validatorAddres.getPort());
                 OutputStream outToServer = broadcastSocket.getOutputStream();
                 DataOutputStream outputStream = new DataOutputStream(outToServer);
-                logger.info("开始向 " + va.getIp() + ":" + va.getPort() + " 发送消息: " + msg);
+                logger.info("开始向 " + validatorAddres.getIp() + ":" + validatorAddres.getPort() + " 发送消息: " + msg);
                 outputStream.writeUTF(msg);
 
                 InputStream inFromServer = broadcastSocket.getInputStream();
@@ -91,11 +94,12 @@ public class NetService {
             DataOutputStream out = new DataOutputStream(outToServer);
             out.writeUTF(msg);
             out.flush();
-            logger.debug("完成写入");
+            logger.info("完成写入");
 
             InputStream inFromServer = client.getInputStream();
             DataInputStream in = new DataInputStream(inFromServer);
             rcvMsg = in.readUTF();
+            logger.info("服务器响应： " + rcvMsg);
             client.close();
         } catch (IOException e) {
             e.printStackTrace();
