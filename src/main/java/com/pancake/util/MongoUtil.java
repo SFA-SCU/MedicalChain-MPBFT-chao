@@ -176,6 +176,24 @@ public class MongoUtil {
     }
 
     /**
+     * 根据字段查找到某条记录，并修改其他字段， 字段类型为 Integer
+     *
+     * @param searchKey
+     * @param searchValue
+     * @param upKey
+     * @param upValue
+     * @param collectionName
+     * @return
+     */
+    public static boolean update(String searchKey, String searchValue, String upKey, Integer upValue,
+                                 String collectionName) {
+        MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+        UpdateResult updateResult = collection.updateMany(eq(searchKey, searchValue),
+                new Document("$set", new Document(upKey, upValue)));
+        return updateResult.wasAcknowledged();
+    }
+
+    /**
      * 判断 collectionName 是否存在
      *
      * @param collectionName
@@ -314,7 +332,6 @@ public class MongoUtil {
 
     /**
      * 获取所有满足 key = value 的文档
-     *
      * @param key
      * @param value
      * @param collectionName
@@ -327,6 +344,23 @@ public class MongoUtil {
             result.add(document.toJson());
         }
         return result;
+    }
+
+    /**
+     * 获取满足 key = value 的文档
+     * @param key
+     * @param value
+     * @param collectionName
+     * @return
+     */
+    public static String findOne(String key, String value, String collectionName) {
+        MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+        Document document = collection.find(eq(key, value)).first();
+        if (null != document) {
+            return document.toJson();
+        } else {
+            return null;
+        }
     }
 
     /**

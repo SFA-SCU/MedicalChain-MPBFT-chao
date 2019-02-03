@@ -89,6 +89,6 @@
 
   "tx_transmitter": {
     "limitTime": 200,
-    "limitSize": 2.0
+    "limitSize": 4.0
   }
 }

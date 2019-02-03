@@ -25,7 +25,7 @@ public class ValidatorHandler implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(ValidatorHandler.class);
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final Socket socket;
-    private CommitMessageService cmtms = new CommitMessageService();
+    private NewCommitMessageService commitMessageService = NewCommitMessageService.getInstance();
     private TransactionMessageService txMsgSerice = TransactionMessageService.getInstance();
     private PrepareMessageService prepareMessageService = PrepareMessageService.getInstance();
     private NetAddress validatorAddress;
@@ -68,18 +68,18 @@ public class ValidatorHandler implements Runnable {
             }
             // 3. 接收到来自其他节点的准备消息，验证后保存
             else if (msgType.equals(Const.PM)) {
-                out.writeUTF("接收到你发送的准备消息");
+                out.writeUTF("接收到你发送的 Prepare 消息");
                 out.flush();
                 socket.close();
                 prepareMessageService.processPrepareMessage(rcvMsg, validatorAddress);
             }
-//            // 4. 接收到来自其他节点的提交消息，验证后保存
-//            else if (msgType.equals(Const.CMTM)) {
-//                out.writeUTF("接收到你发送的commit消息");
-//                out.flush();
-//                socket.close();
-//                cmtms.procCMTM(rcvMsg, validatorAddress);
-//            }
+            // 4. 接收到来自其他节点的提交消息，验证后保存
+            else if (msgType.equals(Const.CMTM)) {
+                out.writeUTF("接收到你发送的 Commit 消息");
+                out.flush();
+                socket.close();
+                commitMessageService.processCommitMessage(rcvMsg, validatorAddress);
+            }
             else {
                 out.writeUTF("未知的 msgType 类型");
                 out.flush();

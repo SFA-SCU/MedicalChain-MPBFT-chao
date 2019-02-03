@@ -20,6 +20,7 @@ public class Const {
     public final static String TXM = "TransactionMsg";
     public final static String LBIM = "LastBlockIdMsg";
     public final static String TIM = "TxIdMsg";
+    public final static String CMTM_COUNT = "CommitMsgCount";
 
     public final static String TX_ID_QUEUE = "TxIdQueue";
     public final static String LAST_BLOCK_ID_QUEUE = "LastBlockIdMsgQueue";

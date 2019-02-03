@@ -11,6 +11,7 @@ import com.pancake.entity.util.Const;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NewCommitMessage extends Message {
     private String prepareMessageId; //
+    private String txId;
     private String ip;  //发送 CommitMessage 节点的ip
     private int port;  // 发送 CommitMessage 节点的端口
 
@@ -18,17 +19,19 @@ public class NewCommitMessage extends Message {
     }
 
     public NewCommitMessage(String msgId, String timestamp, String pubKey, String signature,
-                            String prepareMessageId, String ip, int port) {
+                            String prepareMessageId, String txId, String ip, int port) {
         super(msgId, Const.CMTM, timestamp, pubKey, signature);
         this.prepareMessageId = prepareMessageId;
+        this.txId = txId;
         this.ip = ip;
         this.port = port;
     }
 
     public NewCommitMessage(String msgId, String msgType, String timestamp, String pubKey, String signature,
-                            String prepareMessageId, String ip, int port) {
+                            String prepareMessageId, String txId, String ip, int port) {
         super(msgId, msgType, timestamp, pubKey, signature);
         this.prepareMessageId = prepareMessageId;
+        this.txId = txId;
         this.ip = ip;
         this.port = port;
     }
@@ -50,6 +53,14 @@ public class NewCommitMessage extends Message {
 
     public void setPrepareMessageId(String prepareMessageId) {
         this.prepareMessageId = prepareMessageId;
+    }
+
+    public String getTxId() {
+        return txId;
+    }
+
+    public void setTxId(String txId) {
+        this.txId = txId;
     }
 
     public String getIp() {
