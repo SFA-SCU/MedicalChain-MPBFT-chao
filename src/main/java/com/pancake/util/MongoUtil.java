@@ -496,7 +496,7 @@ public class MongoUtil {
         FindIterable<Document> findIterable = collection.find(eq("msgId", prepareMessageId));
         String prepareMessageStr = null;
         if (findIterable.iterator().hasNext()) {
-            logger.info("msgId 存在于集合：" + collectionName);
+            logger.debug("msgId 存在于集合：" + collectionName);
             prepareMessageStr = findIterable.first().toJson();
             return objectMapper.readValue(prepareMessageStr, PrepareMessage.class);
         } else {
@@ -553,6 +553,49 @@ public class MongoUtil {
      */
     public static int countValuesByKey(String key, String collectionName) {
         return findValuesByKey(key, collectionName).size();
+    }
+
+    /**
+     * 搜索大的集合中不存在与小的集合汇中的记录
+     * @param collA
+     * @param collB
+     */
+    public static void compare2Collection(String collA, String collB) {
+        MongoCollection<Document> collectionA = mongoDatabase.getCollection(collA);
+        MongoCollection<Document> collectionB = mongoDatabase.getCollection(collB);
+        long countA = collectionA.count();
+        long countB = collectionB.count();
+        System.out.println("CollectionA Records: " + countA + ", CollectionB Records: " + countB);
+
+        MongoCollection<Document> bigCollection = null;
+        MongoCollection<Document> smallCollection = null;
+        String bigName = "";
+        String smallName = "";
+        if (countA < countB) {
+            smallCollection = collectionA;
+            bigCollection = collectionB;
+            smallName = collA;
+            bigName = collB;
+
+        } else {
+            smallCollection = collectionB;
+            bigCollection = collectionA;
+            smallName = collB;
+            bigName = collA;
+        }
+
+        FindIterable<Document> findIterable = bigCollection.find();
+        MongoCursor<Document> mongoCursor = findIterable.iterator();
+        Document record;
+        while (mongoCursor.hasNext()) {
+            record = mongoCursor.next();
+            FindIterable<Document> result = smallCollection.find(eq("msgId", record.get("msgId")));
+            if (result != null && result.first() == null) {
+                System.out.println(bigName + "中的" + record.toJson() + "不存在 " + smallName + " 中");
+            } else if (result == null) {
+                logger.error("result == null");
+            }
+        }
     }
 
     public static void main(String args[]) {

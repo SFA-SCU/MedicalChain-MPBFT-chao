@@ -5,8 +5,8 @@ import org.junit.Test;
 /**
  * Created by chao on 2019/2/3.
  */
-public class NewCommitMessageServiceTest {
-    private NewCommitMessageService commitMessageService = NewCommitMessageService.getInstance();
+public class CommitMessageServiceTest {
+    private CommitMessageService commitMessageService = CommitMessageService.getInstance();
 
     @Test
     public void getInstance() throws Exception {

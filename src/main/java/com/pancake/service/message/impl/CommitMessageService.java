@@ -1,15 +1,13 @@
 package com.pancake.service.message.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pancake.entity.message.ClientMessage;
-import com.pancake.entity.message.CommitMessage;
-import com.pancake.entity.message.CommittedMessage;
-import com.pancake.entity.message.PrePrepareMessage;
+import com.pancake.entity.component.CommitMessageCount;
+import com.pancake.entity.message.*;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
-import com.pancake.service.component.BlockService;
-import com.pancake.service.component.TransactionService;
-import com.pancake.util.*;
+import com.pancake.util.MongoUtil;
+import com.pancake.util.SignatureUtil;
+import com.pancake.util.TimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,95 +21,154 @@ import java.security.PrivateKey;
 public class CommitMessageService {
     private final static Logger logger = LoggerFactory.getLogger(CommitMessageService.class);
     private final static ObjectMapper objectMapper = new ObjectMapper();
-    private TransactionService txService = TransactionService.getInstance();
-    private BlockService blockService = BlockService.getInstance();
-    private CommittedMessageService cmtdmService = CommittedMessageService.getInstance();
+
+    private static class LazyHolder {
+        private static final CommitMessageService INSTANCE = new CommitMessageService();
+    }
+    private CommitMessageService() {
+    }
+    public static CommitMessageService getInstance() {
+        return CommitMessageService.LazyHolder.INSTANCE;
+    }
 
     /**
      * 处理接收到的 commit message
-     * @param rcvMsg
+     *
+     * @param receivedMessage
      * @param validatorAddr
      * @throws IOException
      */
     @SuppressWarnings("Duplicates")
-    public void procCMTM(String rcvMsg, NetAddress validatorAddr) throws IOException {
+    public void processCommitMessage(String receivedMessage, NetAddress validatorAddr) throws IOException {
         String url = validatorAddr.toString();
-        logger.info("本机地址为：" + url);
+        logger.debug("本机地址为：" + url);
 
         // 1. 校验接收到的 CommitMessage
-        CommitMessage cmtm = objectMapper.readValue(rcvMsg, CommitMessage.class);
-        logger.info("接收到 CommitMsg：" + rcvMsg);
-        logger.info("开始校验 CommitMsg ...");
-        boolean verifyRes = CommitMessageService.verify(cmtm);
-        logger.debug("校验结束，结果为：" + verifyRes);
+        CommitMessage commitMessage = objectMapper.readValue(receivedMessage, CommitMessage.class);
+        logger.info("接收到 CommitMsg：" + receivedMessage);
+        logger.debug("开始校验 CommitMsg ...");
+        boolean verifyResult = this.verify(commitMessage);
+        logger.debug("校验结束，结果为：" + verifyResult);
 
-        if(verifyRes) {
-            String cmtmCollection = url + "." + Const.CMTM;
-            String ppmCollection = url + "." + Const.PPM;
+        if (verifyResult) {
+            String commitMessageCollection = url + "." + Const.CMTM;
+            String prepareMessageCollection = url + "." + Const.PM;
+            String commitMessageCountCollection = url + "." + Const.CMTM_COUNT;
 
-            PrePrepareMessage ppm = MongoUtil.findPPMById(SignatureUtil.getSha256Base64(cmtm.getPpmSign()), ppmCollection);
-            if(ppm != null) {
-                // 1. 统计 ppmSign 出现的次数
-                int count = MongoUtil.countPPMSign(cmtm.getPpmSign(), cmtm.getViewId(), cmtm.getSeqNum(), cmtmCollection);
-                logger.debug("count = " + count);
+            PrepareMessage prepareMessage = MongoUtil.findPrepareMessageById(commitMessage.getPrepareMessageId(),
+                    prepareMessageCollection);
+            if (prepareMessage != null) {
+//                // 1. 统计 PrepareMessageId 出现的次数
+////                int count = MongoUtil.countPPMSign(commitMessage.getPrepareMessageId(), commitMessageCollection);
+//                int count = MongoUtil.countPrepareMessageId(commitMessage.getPrepareMessageId(), commitMessageCollection);
+//                logger.debug("count = " + count);
 
-                // 2. 将 CommitMessage 存入到集合中
-                if (CommitMessageService.save(cmtm, cmtmCollection)) {
-                    logger.info("将CommitMessage [" + cmtm.getMsgId() + "] 存入数据库");
+                // 1. 将 CommitMessage 存入到集合中
+                if (this.save(commitMessage, commitMessageCollection)) {
+                    logger.debug("将CommitMessage [" + commitMessage.getMsgId() + "] 存入数据库");
+                    // 2. 更新某交易单所对应的来自不同节点的 commit message 的个数
+                    String clientMsgId = commitMessage.getClientMsgId();
+                    boolean result = this.updateCommitMessageQuantity(clientMsgId,
+                            commitMessageCountCollection);
+                    if (result) {
+                        logger.debug("更新 " + clientMsgId + "数量成功");
+                    } else {
+                        logger.debug("更新 " + clientMsgId + "数量失败");
+                    }
+
                 } else {
-                    logger.info("CommitMessage [" + cmtm.getMsgId() + "] 已存在");
+                    logger.error("CommitMessage [" + commitMessage.getMsgId() + "] 已存在");
                 }
 
                 // 3. 达成 count >= 2 * f 后存入到集合中
-                if (2 * PeerUtil.getFaultCount() <= count) {
-                    CommittedMessage cmtdm = cmtdmService.genInstance(ppm.getClientMsg().getMsgId(), ppm.getViewId(),
-                            ppm.getSeqNum(), validatorAddr.getIp(), validatorAddr.getPort());
-                    ClientMessage clientMessage = ppm.getClientMsg();
-                    cmtdmService.procCMTDM(cmtdm, clientMessage, validatorAddr);
-                }
+//                if (2 * PeerUtil.getFaultCount() <= count) {
+//                    CommittedMessage cmtdm = cmtdmService.genInstance(prepareMessage.getClientMsg().getMsgId(), prepareMessage.getViewId(),
+//                            prepareMessage.getSeqNum(), validatorAddr.getIp(), validatorAddr.getPort());
+//                    ClientMessage clientMessage = prepareMessage.getClientMsg();
+//                    cmtdmService.procCMTDM(cmtdm, clientMessage, validatorAddr);
+//                }
+                //TODO
             }
         }
 
     }
 
-    public static CommitMessage genCommitMsg(String ppmSign, String viewId, String seqNum, String ip, int port) {
+    public CommitMessage genInstance(String prepareMessageId, String clientMsgId, String ip, int port) {
         String timestamp = TimeUtil.getNowTimeStamp();
         PrivateKey privateKey = SignatureUtil.loadPvtKey("EC");
         String pubKey = SignatureUtil.loadPubKeyStr("EC");
-        String signature = SignatureUtil.sign(privateKey, getSignContent(ppmSign, viewId, seqNum, timestamp, ip, port));
+        String signature = SignatureUtil.sign(privateKey, getSignContent(prepareMessageId, timestamp, ip, port));
         String msgId = SignatureUtil.getSha256Base64(signature);
-        return new CommitMessage(msgId, timestamp, pubKey, signature, viewId, seqNum, ppmSign, ip, port);
+        return new CommitMessage(msgId, timestamp, pubKey, signature, prepareMessageId, clientMsgId, ip, port);
 
     }
 
     /**
      * 生成签名的内容
-     * @param ppmSign
-     * @param viewId
-     * @param seqNum
+     * @param prepareMessageId
      * @param timestamp
      * @param ip
      * @param port
      * @return
      */
-    public static String getSignContent(String ppmSign, String viewId, String seqNum, String timestamp, String ip, int port) {
+    public String getSignContent(String prepareMessageId, String timestamp, String ip, int port) {
         StringBuilder sb = new StringBuilder();
-        sb.append(ppmSign).append(viewId).append(seqNum).append(timestamp).append(ip).append(port);
+        sb.append(prepareMessageId).append(timestamp).append(ip).append(port);
         return sb.toString();
     }
 
-    public static boolean save(CommitMessage cm, String collectionName){
-        if(MongoUtil.findByKV("msgId", cm.getMsgId(), collectionName)) {
-            logger.info("CommitMessage 消息 [" + cm.getMsgId() + "] 已存在");
-            return false;
-        } else {
-            MongoUtil.insertJson(cm.toString(), collectionName);
-            return true;
+    /**
+     *
+     * @param commitMessage
+     * @param collectionName
+     * @return
+     */
+    public boolean save(CommitMessage commitMessage, String collectionName) {
+        synchronized (this) {
+            if (MongoUtil.findByKV("msgId", commitMessage.getMsgId(), collectionName)) {
+                return false;
+            } else {
+                MongoUtil.insertJson(commitMessage.toString(), collectionName);
+                return true;
+            }
         }
     }
 
-    public static boolean verify(CommitMessage cmtm) {
-        return SignatureUtil.verify(cmtm.getPubKey(), getSignContent(cmtm.getPpmSign(), cmtm.getViewId(),
-                cmtm.getSeqNum(), cmtm.getTimestamp(), cmtm.getIp(), cmtm.getPort()), cmtm.getSignature());
+    /**
+     *
+     * @param commitMessage
+     * @return
+     */
+    public boolean verify(CommitMessage commitMessage) {
+        return SignatureUtil.verify(commitMessage.getPubKey(), getSignContent(commitMessage.getPrepareMessageId(),
+                commitMessage.getTimestamp(), commitMessage.getIp(), commitMessage.getPort()),
+                commitMessage.getSignature());
+    }
+
+    public boolean updateCommitMessageQuantity(String txId, String collectionName){
+        synchronized (this) {
+            String record = MongoUtil.findOne("txId", txId, collectionName);
+            CommitMessageCount commitMessageCount = null;
+            if (null != record && !record.equals("") ) {
+                try {
+                    commitMessageCount = objectMapper.readValue(record, CommitMessageCount.class);
+                    int txIdCount = commitMessageCount.getTxIdCount() + 1;
+                    // 数量加1
+                    MongoUtil.update("txId", txId, "txIdCount", txIdCount,
+                            collectionName);
+                    logger.debug("txId: " + txId);
+                    // TODO 若满足2f，则提交Tx
+
+                } catch (IOException e) {
+                    logger.error("commitMessageCount [" + record + "] 解析失败， 错误信息为： " + e.getMessage());
+                    return false;
+                }
+
+            } else {
+                commitMessageCount = new CommitMessageCount(txId, 1, false);
+                MongoUtil.insertJson(commitMessageCount.toString(), collectionName);
+            }
+            return true;
+        }
     }
 }

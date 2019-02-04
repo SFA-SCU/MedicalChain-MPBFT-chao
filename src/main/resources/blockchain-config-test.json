@@ -66,8 +66,8 @@
 
   "rabbitmq": {
     "userName": "admin",
-    "password": "admin",
-    "ip": "127.0.0.1",
+    "password": "zc-12332145",
+    "ip": "203.195.231.164",
     "port":5672
   },
 
@@ -88,7 +88,7 @@
   },
 
   "tx_transmitter": {
-    "limitTime": 200,
+    "limitTime": 1000,
     "limitSize": 4.0
   }
 }

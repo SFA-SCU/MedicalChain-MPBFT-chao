@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.entity.message.*;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
+import com.pancake.service.component.NetService;
 import com.pancake.util.MongoUtil;
 import com.pancake.util.SignatureUtil;
 import com.pancake.util.TimeUtil;
@@ -20,6 +21,7 @@ import java.security.PrivateKey;
 public class PrepareMessageService {
     private final static Logger logger = LoggerFactory.getLogger(PrepareMessageService.class);
     private final static ObjectMapper objectMapper = new ObjectMapper();
+    private CommitMessageService commitMessageService = CommitMessageService.getInstance();
 
     private static class LazyHolder {
         private static final PrepareMessageService INSTANCE = new PrepareMessageService();
@@ -58,13 +60,13 @@ public class PrepareMessageService {
                 logger.debug("PrePrepareMessage [" + prepareMessage.getMsgId() + "] 已存在");
             }
 
-//            // 3. 生成 CommitMessage，存入集合，并向其他节点进行广播
-//            NewCommitMessage commitMessage = NewCommitMessageService.genInstance(prepareMessage.getMsgId(),
-//                    validatorAddress.getIp(), validatorAddress.getPort());
-//            String commitMessageCollection = url + "." + Const.CMTM;
-//            NewCommitMessageService.save(commitMessage, commitMessageCollection);
-//            logger.debug("CommitMessage [" + commitMessage.getMsgId() + "] 已存入数据库");
-//            NetService.broadcastMsg(validatorAddress.getIp(), validatorAddress.getPort(), commitMessage.toString());
+            // 3. 生成 CommitMessage，存入集合，并向其他节点进行广播
+            CommitMessage commitMessage = commitMessageService.genInstance(prepareMessage.getMsgId(),
+                    prepareMessage.getClientMsg().getMsgId(), validatorAddress.getIp(), validatorAddress.getPort());
+            String commitMessageCollection = url + "." + Const.CMTM;
+            commitMessageService.save(commitMessage, commitMessageCollection);
+            logger.debug("CommitMessage [" + commitMessage.getMsgId() + "] 已存入数据库");
+            NetService.broadcastMsg(validatorAddress.getIp(), validatorAddress.getPort(), commitMessage.toString());
         }
         return verifyResult;
     }

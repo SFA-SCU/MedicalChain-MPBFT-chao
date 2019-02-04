@@ -25,7 +25,7 @@ public class ValidatorHandler implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(ValidatorHandler.class);
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final Socket socket;
-    private NewCommitMessageService commitMessageService = NewCommitMessageService.getInstance();
+    private CommitMessageService commitMessageService = CommitMessageService.getInstance();
     private TransactionMessageService txMsgSerice = TransactionMessageService.getInstance();
     private PrepareMessageService prepareMessageService = PrepareMessageService.getInstance();
     private NetAddress validatorAddress;

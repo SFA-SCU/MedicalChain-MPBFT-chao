@@ -10,30 +10,28 @@ import com.pancake.entity.util.Const;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CommitMessage extends Message {
-    private String viewId;  // 当前视图编号
-    private String seqNum;  // sequence number， 该请求是在视图v中被赋予了序号n
-    private String ppmSign; //ppm消息中的数字签名，相当于消息 m 的 digest d.
-    private String ip;  //发送PrepareMessage的ip
-    private int port;  // 发送PrepareMessage的端口
+    private String prepareMessageId; //
+    private String clientMsgId;
+    private String ip;  //发送 CommitMessage 节点的ip
+    private int port;  // 发送 CommitMessage 节点的端口
 
     public CommitMessage() {
     }
 
     public CommitMessage(String msgId, String timestamp, String pubKey, String signature,
-                         String viewId, String seqNum, String ppmSign, String ip, int port) {
+                         String prepareMessageId, String clientMsgId, String ip, int port) {
         super(msgId, Const.CMTM, timestamp, pubKey, signature);
-        this.viewId = viewId;
-        this.seqNum = seqNum;
-        this.ppmSign = ppmSign;
+        this.prepareMessageId = prepareMessageId;
+        this.clientMsgId = clientMsgId;
         this.ip = ip;
         this.port = port;
     }
 
     public CommitMessage(String msgId, String msgType, String timestamp, String pubKey, String signature,
-                         String viewId, String seqNum, String ppmSign, String ip, int port) {
+                         String prepareMessageId, String clientMsgId, String ip, int port) {
         super(msgId, msgType, timestamp, pubKey, signature);
-        this.viewId = viewId;
-        this.seqNum = seqNum;
+        this.prepareMessageId = prepareMessageId;
+        this.clientMsgId = clientMsgId;
         this.ip = ip;
         this.port = port;
     }
@@ -49,28 +47,20 @@ public class CommitMessage extends Message {
         return rtn;
     }
 
-    public String getViewId() {
-        return viewId;
+    public String getPrepareMessageId() {
+        return prepareMessageId;
     }
 
-    public void setViewId(String viewId) {
-        this.viewId = viewId;
+    public void setPrepareMessageId(String prepareMessageId) {
+        this.prepareMessageId = prepareMessageId;
     }
 
-    public String getSeqNum() {
-        return seqNum;
+    public String getClientMsgId() {
+        return clientMsgId;
     }
 
-    public void setSeqNum(String seqNum) {
-        this.seqNum = seqNum;
-    }
-
-    public String getPpmSign() {
-        return ppmSign;
-    }
-
-    public void setPpmSign(String ppmSign) {
-        this.ppmSign = ppmSign;
+    public void setClientMsgId(String clientMsgId) {
+        this.clientMsgId = clientMsgId;
     }
 
     public String getIp() {

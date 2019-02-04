@@ -125,4 +125,9 @@ public class RunUtil {
             System.out.println(res);
         }
     }
+
+    @Test
+    public void compare() {
+        MongoUtil.compare2Collection("127.0.0.1:8001.CommitMsg", "127.0.0.1:8002.CommitMsg");
+    }
 }
