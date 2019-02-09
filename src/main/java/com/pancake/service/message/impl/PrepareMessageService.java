@@ -132,4 +132,24 @@ public class PrepareMessageService {
         sb.append(clientMsgId).append(timestamp);
         return sb.toString();
     }
+
+    /**
+     * 根据 client msg id 获取 Prepare Message
+     * @param clientMsgId
+     * @param collectionName
+     * @return
+     */
+    public PrepareMessage getByClientMsgId(String clientMsgId, String collectionName) {
+        String record = MongoUtil.findOne("clientMsg.msgId", clientMsgId, collectionName);
+        PrepareMessage prepareMessage = null;
+        if (null != record && !record.equals("") ) {
+            try {
+                prepareMessage = objectMapper.readValue(record, PrepareMessage.class);
+            } catch (IOException e) {
+                logger.error("Prepare Message [" + record + "] 解析失败， 错误信息为： " + e.getMessage());
+                return null;
+            }
+        }
+        return prepareMessage;
+    }
 }

@@ -2,10 +2,14 @@ package com.pancake.service.message.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.entity.component.CommitMessageCount;
+import com.pancake.entity.component.Transaction;
 import com.pancake.entity.message.*;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
+import com.pancake.service.component.NetService;
+import com.pancake.service.component.TransactionService;
 import com.pancake.util.MongoUtil;
+import com.pancake.util.PeerUtil;
 import com.pancake.util.SignatureUtil;
 import com.pancake.util.TimeUtil;
 import org.slf4j.Logger;
@@ -13,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.PrivateKey;
+import java.util.List;
 
 
 /**
@@ -21,6 +26,9 @@ import java.security.PrivateKey;
 public class CommitMessageService {
     private final static Logger logger = LoggerFactory.getLogger(CommitMessageService.class);
     private final static ObjectMapper objectMapper = new ObjectMapper();
+    private final static CommitMessageService commitMessageService = CommitMessageService.getInstance();
+    private final static PrepareMessageService prepareMessageService = PrepareMessageService.getInstance();
+    private final static TransactionService txService = TransactionService.getInstance();
 
     private static class LazyHolder {
         private static final CommitMessageService INSTANCE = new CommitMessageService();
@@ -53,7 +61,7 @@ public class CommitMessageService {
         if (verifyResult) {
             String commitMessageCollection = url + "." + Const.CMTM;
             String prepareMessageCollection = url + "." + Const.PM;
-            String commitMessageCountCollection = url + "." + Const.CMTM_COUNT;
+//            String commitMessageCountCollection = url + "." + Const.CMTM_COUNT;
 
             PrepareMessage prepareMessage = MongoUtil.findPrepareMessageById(commitMessage.getPrepareMessageId(),
                     prepareMessageCollection);
@@ -68,8 +76,8 @@ public class CommitMessageService {
                     logger.debug("将CommitMessage [" + commitMessage.getMsgId() + "] 存入数据库");
                     // 2. 更新某交易单所对应的来自不同节点的 commit message 的个数
                     String clientMsgId = commitMessage.getClientMsgId();
-                    boolean result = this.updateCommitMessageQuantity(clientMsgId,
-                            commitMessageCountCollection);
+//                    boolean result = this.updateCommitMessageQuantity(clientMsgId, url);
+                    boolean result = this.updateCommitMessageQuantity(commitMessage, validatorAddr);
                     if (result) {
                         logger.debug("更新 " + clientMsgId + "数量成功");
                     } else {
@@ -145,19 +153,66 @@ public class CommitMessageService {
                 commitMessage.getSignature());
     }
 
-    public boolean updateCommitMessageQuantity(String txId, String collectionName){
+    public boolean updateCommitMessageQuantity(CommitMessage commitMessage, NetAddress validatorAddress){
+        String url = validatorAddress.toString();
+        String commitMessageCountCollection = url + "." + Const.CMTM_COUNT;
+        String txMsgCollection = url + "." + Const.TXM;
+        String prepareMsgCollection = url + "." + Const.PM;
+        String txCollection = url + "." + Const.TX;
+        String clientMsgId = commitMessage.getClientMsgId();
         synchronized (this) {
-            String record = MongoUtil.findOne("txId", txId, collectionName);
+            String record = MongoUtil.findOne("clientMsgId", clientMsgId, commitMessageCountCollection);
             CommitMessageCount commitMessageCount = null;
             if (null != record && !record.equals("") ) {
                 try {
                     commitMessageCount = objectMapper.readValue(record, CommitMessageCount.class);
-                    int txIdCount = commitMessageCount.getTxIdCount() + 1;
+                    int clientMsgIdCount = commitMessageCount.getClientMsgIdCount() + 1;
                     // 数量加1
-                    MongoUtil.update("txId", txId, "txIdCount", txIdCount,
-                            collectionName);
-                    logger.debug("txId: " + txId);
-                    // TODO 若满足2f，则提交Tx
+                    MongoUtil.update("clientMsgId", clientMsgId, "clientMsgIdCount", clientMsgIdCount,
+                            commitMessageCountCollection);
+                    logger.debug("clientMsgId: " + clientMsgId);
+
+                    // 若满足2f，则提交Client
+                    if (clientMsgIdCount >= 2 * PeerUtil.getFaultCount() && !commitMessageCount.isCommitted()) {
+                        // 1. 检查当前节点是否为主节点
+                        if(MongoUtil.findByKV("msgId", clientMsgId, txMsgCollection)) {
+                            // 2. 生成 CommitMessage，存入集合，并向其他节点进行广播
+                            CommitMessage newCommitMessage = commitMessageService.genInstance(
+                                    commitMessage.getPrepareMessageId(), clientMsgId, validatorAddress.getIp(),
+                                    validatorAddress.getPort());
+                            String commitMessageCollection = url + "." + Const.CMTM;
+                            commitMessageService.save(newCommitMessage , commitMessageCollection);
+                            logger.debug("CommitMessage [" + newCommitMessage .getMsgId() + "] 已存入数据库");
+                            NetService.broadcastMsg(validatorAddress.getIp(), validatorAddress.getPort(),
+                                    newCommitMessage.toString());
+                        }
+                        // 3. 正式提交来自客户端的提案
+                        PrepareMessage prepareMessage = prepareMessageService.getByClientMsgId(clientMsgId,
+                                prepareMsgCollection);
+                        ClientMessage clientMsg = prepareMessage.getClientMsg();
+//                        String cliMsgType = clientMsg.getMsgType();
+                        String cliMsgType = clientMsg.getClass().getSimpleName();
+                        if (cliMsgType.equals(TransactionMessage.class.getSimpleName())) {
+                            // 如果 clientMessage 引用的对象为 TransactionMessage 类型
+                            TransactionMessage txMessage = (TransactionMessage) clientMsg;
+                            List<Transaction> txList = txMessage.getTxList();
+                            if (txService.saveBatch(txList, txCollection)) {
+                                List<String> txIdList = txService.getTxIdList(txList);
+                                logger.info("交易 :" + txIdList + " 存入成功");
+
+                                //TODO 验证成功的 tx 发送到 blocker 服务器上
+//                                TxIdMessage txIdMsg = timSrv.genInstance(txIdList, netAddress.getIp(), netAddress.getPort());
+//                                netService.sendMsg(txIdMsg.toString(), blockerAddr.getIp(), blockerAddr.getPort());
+                            }
+                        } else {
+                            logger.error("未知ClientMsg类型: " + cliMsgType);
+                        }
+
+                        // 更新 CommitMessageCount 的 committed 状态为 true
+                        MongoUtil.update("clientMsgId", clientMsgId, "committed", true,
+                                commitMessageCountCollection);
+
+                    }
 
                 } catch (IOException e) {
                     logger.error("commitMessageCount [" + record + "] 解析失败， 错误信息为： " + e.getMessage());
@@ -165,8 +220,8 @@ public class CommitMessageService {
                 }
 
             } else {
-                commitMessageCount = new CommitMessageCount(txId, 1, false);
-                MongoUtil.insertJson(commitMessageCount.toString(), collectionName);
+                commitMessageCount = new CommitMessageCount(clientMsgId, 1, false);
+                MongoUtil.insertJson(commitMessageCount.toString(), commitMessageCountCollection);
             }
             return true;
         }

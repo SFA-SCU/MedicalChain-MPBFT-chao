@@ -145,6 +145,23 @@ public class MongoDB {
         return result;
     }
 
+    /**
+     * 获取所有满足 key = value 的文档
+     *
+     * @param key
+     * @param value
+     * @param collectionName
+     * @return
+     */
+    public List<String> find(String key, Boolean value, String collectionName) {
+        List<String> result = new ArrayList<String>();
+        MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+        for (Document document : collection.find(eq(key, value))) {
+            result.add(document.toJson());
+        }
+        return result;
+    }
+
 
     /**
      * 获取集合 collectionName 中的记录数

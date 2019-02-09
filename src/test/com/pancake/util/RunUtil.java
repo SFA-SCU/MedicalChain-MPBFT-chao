@@ -8,6 +8,8 @@ import com.pancake.entity.util.NetAddress;
 import com.pancake.service.component.BlockService;
 import com.pancake.service.component.TransactionService;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
  * Created by chao on 2019/2/3.
  */
 public class RunUtil {
+    private final static Logger logger = LoggerFactory.getLogger(RunUtil.class);
     private TransactionService txService = TransactionService.getInstance();
     private BlockService blockService = BlockService.getInstance();
     @Test
@@ -27,7 +30,7 @@ public class RunUtil {
         List<String> txList = new ArrayList<String>();
         try {
             long startTime = System.currentTimeMillis();
-            int textTxCount = 10000;
+            int textTxCount = 500;
             for (int i = 0; i < textTxCount; i++) {
                 Transaction tx = txService.genTx(TxType.INSERT.getName(), new TxString("测试" + i));
                 txList.add(tx.toString());
@@ -129,5 +132,26 @@ public class RunUtil {
     @Test
     public void compare() {
         MongoUtil.compare2Collection("127.0.0.1:8001.CommitMsg", "127.0.0.1:8002.CommitMsg");
+    }
+
+    @Test
+    public void findUnCommitClientMsg() {
+        String url;
+        String commitMsgCountCollection;
+        List<NetAddress> netAddresses = JsonUtil.getValidatorAddressList(Const.BlockChainConfigFile);
+        MongoDB mongoDB;
+
+        // 1. 检索 Validator 上的所有集合
+        for (NetAddress na : netAddresses) {
+            url = na.toString();
+            mongoDB = new MongoDB(new NetAddress(na.getIp(), 27017), Const.BLOCK_CHAIN);
+            commitMsgCountCollection = url + "." + Const.CMTM_COUNT;
+//            System.out.println(commitMsgCountCollection);
+            List<String> result = mongoDB.find("committed", false, commitMsgCountCollection);
+            for (String str : result) {
+                logger.error(commitMsgCountCollection + ": " + str);
+            }
+
+        }
     }
 }

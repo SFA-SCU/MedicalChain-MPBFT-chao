@@ -10,16 +10,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CommitMessageCount {
-    private String txId;
-    private int txIdCount;
+    private String clientMsgId;
+    private int clientMsgIdCount;
     private boolean committed;
 
     public CommitMessageCount() {
     }
 
-    public CommitMessageCount(String txId, int txIdCount, boolean committed) {
-        this.txId = txId;
-        this.txIdCount = txIdCount;
+    public CommitMessageCount(String clientMsgId, int clientMsgIdCount, boolean committed) {
+        this.clientMsgId = clientMsgId;
+        this.clientMsgIdCount = clientMsgIdCount;
         this.committed = committed;
     }
 
@@ -34,20 +34,20 @@ public class CommitMessageCount {
         return rtn;
     }
 
-    public String getTxId() {
-        return txId;
+    public String getClientMsgId() {
+        return clientMsgId;
     }
 
-    public void setTxId(String txId) {
-        this.txId = txId;
+    public void setClientMsgId(String clientMsgId) {
+        this.clientMsgId = clientMsgId;
     }
 
-    public int getTxIdCount() {
-        return txIdCount;
+    public int getClientMsgIdCount() {
+        return clientMsgIdCount;
     }
 
-    public void setTxIdCount(int txIdCount) {
-        this.txIdCount = txIdCount;
+    public void setClientMsgIdCount(int clientMsgIdCount) {
+        this.clientMsgIdCount = clientMsgIdCount;
     }
 
     public boolean isCommitted() {

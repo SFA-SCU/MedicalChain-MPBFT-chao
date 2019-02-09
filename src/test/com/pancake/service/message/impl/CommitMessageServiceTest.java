@@ -34,9 +34,9 @@ public class CommitMessageServiceTest {
 
     @Test
     public void updateCommitMessageQuantity() throws Exception {
-        for (int i = 0; i < 100; i++) {
-            commitMessageService.updateCommitMessageQuantity("001", "test");
-        }
+//        for (int i = 0; i < 100; i++) {
+//            commitMessageService.updateCommitMessageQuantity("001", "test");
+//        }
     }
 
 }
