@@ -24,10 +24,10 @@
     "database" : "BlockChain"
   },
   "rabbitmq" : {
-    "ip" : "127.0.0.1",
+    "ip" : "203.195.231.164",
     "port" : 5672,
     "userName" : "admin",
-    "password" : "admin"
+    "password" : "zc-12332145"
   },
   "key_pair" : {
     "pvt_key_file" : "C:\\Users\\chao\\privateKey.txt",

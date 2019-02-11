@@ -106,6 +106,58 @@ public class RunUtil {
         }
     }
 
+    /**
+     * 统计不同主机上记录的个数
+     */
+    @Test
+    public void countRecords() {
+        NetAddress[] nodes = {new NetAddress("203.195.231.164", 8000),
+                new NetAddress("129.204.192.162", 8000),
+                new NetAddress("203.195.213.247", 8000),
+                new NetAddress("123.207.85.144", 8000)};
+        NetAddress[] prefix = {new NetAddress("172.16.0.6", 8000),
+                new NetAddress("172.16.0.4", 8000),
+                new NetAddress("172.16.0.5", 8000),
+                new NetAddress("172.16.0.10", 8000)};
+        int nodesCount = nodes.length;
+        int mongoPort = 27017;
+        String username = "blockchain";
+        String password = "zc-12332145";
+        String database = "BlockChain";
+        String pmCollection;
+        String cmtmCollection;
+        String txCollection;
+        MongoDBConfig config;
+        MongoDB mongoDB;
+
+        List<String> result = new ArrayList<String>();
+
+        for(int i = 0; i < nodesCount; i++) {
+            config = new MongoDBConfig(nodes[i].getIp(), mongoPort, username, password, database);
+            mongoDB = new MongoDB(config);
+
+            pmCollection = prefix[i].toString() + "." + Const.PM;
+            cmtmCollection = prefix[i].toString() + "." + Const.CMTM;
+            txCollection = prefix[i].toString() + "." + Const.TX;
+
+            long pmCount = mongoDB.countRecords(pmCollection);
+            long cmtmCount = mongoDB.countRecords(cmtmCollection);
+            long txCount = mongoDB.countRecords(txCollection);
+
+            result.add("主机 [ " + nodes[i].toString() + " ] < "
+                    + "prepare msg: " + pmCount
+                    + ", commit msg: " + cmtmCount
+                    + ", tx count: " + txCount);
+        }
+
+        result.add("=================================================================================");
+
+        for (String res : result) {
+            System.out.println(res);
+        }
+
+    }
+
     @Test
     public void compare() {
         MongoUtil.compare2Collection("127.0.0.1:8001.CommitMsg", "127.0.0.1:8002.CommitMsg");
@@ -139,10 +191,10 @@ public class RunUtil {
     @Test
     public void generateConfigFile() {
 
-        NetAddress validator1 = new NetAddress("127.0.0.1", 8000);
-        NetAddress validator2 = new NetAddress("127.0.0.1", 8001);
-        NetAddress validator3 = new NetAddress("127.0.0.1", 8002);
-        NetAddress validator4 = new NetAddress("127.0.0.1", 8003);
+        NetAddress validator1 = new NetAddress("172.16.0.6", 8000);
+        NetAddress validator2 = new NetAddress("172.16.0.5", 8000);
+        NetAddress validator3 = new NetAddress("172.16.0.10", 8000);
+        NetAddress validator4 = new NetAddress("172.16.0.4", 8000);
 
         int validatorCount = 4;
 
