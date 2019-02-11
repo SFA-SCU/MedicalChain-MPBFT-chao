@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.entity.component.Transaction;
 import com.pancake.entity.content.TxString;
 import com.pancake.entity.enumeration.TxType;
+import com.pancake.entity.pojo.MongoDBConfig;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
 import com.pancake.service.component.BlockService;
@@ -27,6 +28,7 @@ public class RunUtil {
     private TransactionService txService = TransactionService.getInstance();
     private BlockService blockService = BlockService.getInstance();
     private final static ObjectMapper objectMapper = new ObjectMapper();
+    private final static MongoDBConfig mongoDBConfig = JsonUtil.getMongoDBConfig(Const.BlockChainConfigFile);
 
     @Test
     /**
@@ -58,9 +60,7 @@ public class RunUtil {
     public void countRecordQuantity() {
         String url;
         String pmCollection;
-        String pdmCollection;
         String cmtmCollection;
-        String cmtdmCollection;
         String blockChainCollection;
         String txCollection;
         List<String> result = new ArrayList<String>();
@@ -68,23 +68,21 @@ public class RunUtil {
         List<NetAddress> netAddresses = JsonUtil.getValidatorAddressList(Const.BlockChainConfigFile);
         MongoDB mongoDB;
 
+
         // 1. 检索 Validator 上的所有集合
         for (NetAddress na : netAddresses) {
             url = na.toString();
-            mongoDB = new MongoDB(new NetAddress("127.0.0.1", 27017), Const.BLOCK_CHAIN);
+
+            mongoDB = new MongoDB(mongoDBConfig);
             pmCollection = url + "." + Const.PM;
-            pdmCollection = url + "." + Const.PDM;
             cmtmCollection = url + "." + Const.CMTM;
-            cmtdmCollection = url + "." + Const.CMTDM;
             blockChainCollection = url + "." + Const.BLOCK_CHAIN;
             txCollection = url + "." + Const.TX;
             String lbiCollection = url + "." + Const.LAST_BLOCK_ID;
             String txIdCollectorColl = "TxIdCollector" + na.getIp() + ":" + (na.getPort() + 1000) + ".TxIds";
 
             long pmCount = mongoDB.countRecords(pmCollection);
-            long pdmCount = mongoDB.countRecords(pdmCollection);
             long cmtmCount = mongoDB.countRecords(cmtmCollection);
-            long cmtdmCount = mongoDB.countRecords(cmtdmCollection);
             long blockChainCount = mongoDB.countRecords(blockChainCollection);
             long txCount = mongoDB.countRecords(txCollection);
             int blockIdCount = mongoDB.countValuesByKey("blockId", blockChainCollection);
@@ -92,44 +90,16 @@ public class RunUtil {
             String lastBlockId = blockService.getLastBlockId(mongoDB, lbiCollection);
 
             result.add("主机 [ " + url + " ] < "
-                    + ", pmCount: " + pmCount
-                    + ", pdmCount: " + pdmCount
-                    + ", cmtmCount: " + cmtmCount
-                    + ", cmtdmCount: " + cmtdmCount
-                    + ", blockChainCount: " + blockChainCount
-                    + ", txCount: " + txCount
-                    + ", blockIdCount: " + blockIdCount
-                    + ", txIdsCount: " + txIdsCount
-                    + ", lastBlockId: " + lastBlockId);
+                    + "prepare msg: " + pmCount
+                    + ", commit msg: " + cmtmCount
+                    + ", tx count: " + txCount
+                    + ", blockchain count: " + blockChainCount
+                    + ", block id count: " + blockIdCount
+                    + ", tx ids count: " + txIdsCount
+                    + ", last block id: " + lastBlockId);
         }
 
         result.add("=================================================================================");
-
-        // 2. 检索 blocker 上的所有集合
-        String lbiCollection;
-        String txIdCollection;
-        String txIdMsgCollection;
-        String blockMsgCollection;
-        List<NetAddress> blockerList = JsonUtil.getBlockerAddressList(Const.BlockChainConfigFile);
-        for (NetAddress blockerAddr : blockerList) {
-            mongoDB = new MongoDB(new NetAddress("127.0.0.1", 27017), Const.BLOCK_CHAIN);
-            blockChainCollection = blockerAddr + "." + Const.BLOCK_CHAIN;
-            lbiCollection = blockerAddr + "." + Const.LAST_BLOCK_ID;
-            txIdCollection = blockerAddr + "." + Const.TX_ID;
-            txIdMsgCollection = blockerAddr + "." + Const.TIM;
-            blockMsgCollection = blockerAddr + "." + Const.BM;
-
-            long blockChainCount = mongoDB.countRecords(blockChainCollection);
-            long blockMsgCount = mongoDB.countRecords(blockMsgCollection);
-            String lastBlockId = blockService.getLastBlockId(mongoDB, lbiCollection);
-            long txIdsCount = mongoDB.countRecords(txIdCollection);
-            long txIdMsgCount = mongoDB.countRecords(txIdMsgCollection);
-            result.add("主机 [ " + blockerAddr + " ] <  blockChainCount: " + blockChainCount
-                    + ", blockMsgCount: " + blockMsgCount
-                    + ", txIdsCount: " + txIdsCount
-                    + ", txIdMsgCount: " + txIdMsgCount
-                    + ", lastBlockId: " + lastBlockId);
-        }
 
         for (String res : result) {
             System.out.println(res);
@@ -163,6 +133,9 @@ public class RunUtil {
         }
     }
 
+    /**
+     * 批量生成多个节点的配置文件
+     */
     @Test
     public void generateConfigFile() {
 
@@ -198,7 +171,9 @@ public class RunUtil {
         Map<String, Object> mongoMap = new LinkedHashMap<String, Object>();
         mongoMap.put("ip", "127.0.0.1");
         mongoMap.put("port", 27017);
-        mongoMap.put("database", "BlockChain");
+        mongoMap.put("username", "chao");
+        mongoMap.put("password", "zc-12332145");
+        mongoMap.put("database", "Blockchain");
         // 3
         configMap1.put("mongodb", mongoMap);
         configMap2.put("mongodb", mongoMap);
@@ -271,5 +246,14 @@ public class RunUtil {
             e.printStackTrace();
         }
 
+    }
+
+    /**
+     * 删除数据库中所有集合
+     */
+    @Test
+    public void clearDB() {
+        MongoDB mongoDB = new MongoDB(mongoDBConfig);
+        mongoDB.deleteAllCollections();
     }
 }

@@ -55,7 +55,7 @@
   "mongodb": {
     "ip": "47.106.95.97",
     "port": 27017,
-    "database": "BlockChain"
+    "database": "Blockchain"
   },
 
   "key_pair": {

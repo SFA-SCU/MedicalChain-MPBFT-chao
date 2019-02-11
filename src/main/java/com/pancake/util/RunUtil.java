@@ -5,6 +5,7 @@ import com.pancake.entity.component.Block;
 import com.pancake.entity.component.Transaction;
 import com.pancake.entity.content.TxString;
 import com.pancake.entity.enumeration.TxType;
+import com.pancake.entity.pojo.MongoDBConfig;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
 import com.pancake.service.component.BlockService;
@@ -65,7 +66,8 @@ public class RunUtil {
         // 1. 检索 Validator 上的所有集合
         for (NetAddress na : netAddresses) {
             url = na.toString();
-            mongoDB = new MongoDB(new NetAddress("127.0.0.1", 27017), Const.BLOCK_CHAIN);
+            MongoDBConfig mongoDBConfig = JsonUtil.getMongoDBConfig(Const.BlockChainConfigFile);
+            mongoDB = new MongoDB(mongoDBConfig);
             ppmCollection = url + "." + Const.PPM;
             pmCollection = url + "." + Const.PM;
             pdmCollection = url + "." + Const.PDM;
