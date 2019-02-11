@@ -171,9 +171,9 @@ public class RunUtil {
         Map<String, Object> mongoMap = new LinkedHashMap<String, Object>();
         mongoMap.put("ip", "127.0.0.1");
         mongoMap.put("port", 27017);
-        mongoMap.put("username", "chao");
+        mongoMap.put("username", "blockchain");
         mongoMap.put("password", "zc-12332145");
-        mongoMap.put("database", "Blockchain");
+        mongoMap.put("database", "BlockChain");
         // 3
         configMap1.put("mongodb", mongoMap);
         configMap2.put("mongodb", mongoMap);

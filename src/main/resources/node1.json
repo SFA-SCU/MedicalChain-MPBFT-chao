@@ -1,0 +1,40 @@
+{
+  "current_validator" : {
+    "ip" : "127.0.0.1",
+    "port" : 8000
+  },
+  "validators" : [ {
+    "ip" : "127.0.0.1",
+    "port" : 8000
+  }, {
+    "ip" : "127.0.0.1",
+    "port" : 8001
+  }, {
+    "ip" : "127.0.0.1",
+    "port" : 8002
+  }, {
+    "ip" : "127.0.0.1",
+    "port" : 8003
+  } ],
+  "mongodb" : {
+    "ip" : "127.0.0.1",
+    "port" : 27017,
+    "username" : "blockchain",
+    "password" : "zc-12332145",
+    "database" : "BlockChain"
+  },
+  "rabbitmq" : {
+    "ip" : "127.0.0.1",
+    "port" : 5672,
+    "userName" : "admin",
+    "password" : "admin"
+  },
+  "key_pair" : {
+    "pvt_key_file" : "C:\\Users\\chao\\privateKey.txt",
+    "pub_key_file" : "C:\\Users\\chao\\publicKey.txt"
+  },
+  "tx_transmitter" : {
+    "limitTime" : 500,
+    "limitSize" : 4
+  }
+}

@@ -5,7 +5,7 @@ package com.pancake.entity.util;
  */
 public class Const {
     public static String BlockChainConfigFile =
-            Const.class.getClassLoader().getResource("blockchain-config-test.json").getPath();
+            Const.class.getClassLoader().getResource("node1.json").getPath();
 
     public static String PvtKeyFile = "C:\\Users\\chao\\medical_chain\\privateKey.txt";
     public static String PubKeyFile = "C:\\Users\\chao\\medical_chain\\publicKey.txt";
