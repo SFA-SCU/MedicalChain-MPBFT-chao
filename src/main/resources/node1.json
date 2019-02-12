@@ -24,17 +24,17 @@
     "database" : "BlockChain"
   },
   "rabbitmq" : {
-    "ip" : "203.195.231.164",
+    "ip" : "127.0.0.1",
     "port" : 5672,
     "userName" : "admin",
-    "password" : "zc-12332145"
+    "password" : "admin"
   },
   "key_pair" : {
     "pvt_key_file" : "C:\\Users\\chao\\privateKey.txt",
     "pub_key_file" : "C:\\Users\\chao\\publicKey.txt"
   },
   "tx_transmitter" : {
-    "limitTime" : 500,
-    "limitSize" : 4
+    "limitTime" : 200,
+    "limitSize" : 8
   }
 }

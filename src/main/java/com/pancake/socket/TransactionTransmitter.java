@@ -63,7 +63,7 @@ public class TransactionTransmitter implements Runnable {
         while (true) {
             txList = txService.pullTxList(queueName, limitTime, limitSize);
             if (txList != null && txList.size() > 0) {
-                logger.info("获得 Transaction：" + txService.getTxIdList(txList));
+                logger.info("获得 Transaction：" + txService.getTxIdList(txList).get(0) + " 等");
                 sendTxMsg(txList);
             }
             try {

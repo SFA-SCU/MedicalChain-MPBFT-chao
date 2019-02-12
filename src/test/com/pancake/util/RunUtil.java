@@ -1,5 +1,7 @@
 package com.pancake.util;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.entity.component.Transaction;
@@ -15,10 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by chao on 2019/2/3.
@@ -29,6 +29,17 @@ public class RunUtil {
     private BlockService blockService = BlockService.getInstance();
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final static MongoDBConfig mongoDBConfig = JsonUtil.getMongoDBConfig(Const.BlockChainConfigFile);
+    private final static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:ms");
+
+    static {
+        ((LoggerContext) LoggerFactory.getILoggerFactory()).getLogger("org.mongodb.driver").
+                setLevel(Level.ERROR);
+    }
+
+    @Test
+    public void countTx() {
+
+    }
 
     @Test
     /**
@@ -39,7 +50,7 @@ public class RunUtil {
         List<String> txList = new ArrayList<String>();
         try {
             long startTime = System.currentTimeMillis();
-            int textTxCount = 500;
+            int textTxCount = 10000;
             for (int i = 0; i < textTxCount; i++) {
                 Transaction tx = txService.genTx(TxType.INSERT.getName(), new TxString("测试" + i));
                 txList.add(tx.toString());
@@ -47,7 +58,10 @@ public class RunUtil {
             }
             long endTime = System.currentTimeMillis();
             System.out.println("添加" + textTxCount + "条 tx 的运行时间：" + (endTime - startTime) / 1000.0 + "s");
+            System.out.println("开始向 rabbitmq 发送 tx");
             rmq.push(txList);
+            endTime = System.currentTimeMillis();
+            System.out.println("发送" + textTxCount + "条 tx 的运行时间：" + (endTime - startTime) / 1000.0 + "s");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,15 +124,16 @@ public class RunUtil {
      * 统计不同主机上记录的个数
      */
     @Test
-    public void countRecords() {
-        NetAddress[] nodes = {new NetAddress("203.195.231.164", 8000),
-                new NetAddress("129.204.192.162", 8000),
-                new NetAddress("203.195.213.247", 8000),
-                new NetAddress("123.207.85.144", 8000)};
-        NetAddress[] prefix = {new NetAddress("172.16.0.6", 8000),
-                new NetAddress("172.16.0.4", 8000),
-                new NetAddress("172.16.0.5", 8000),
-                new NetAddress("172.16.0.10", 8000)};
+    public void countRecords() throws InterruptedException {
+        NetAddress[] nodes = {new NetAddress("193.112.198.57", 8000),
+                new NetAddress("193.112.186.91", 8000),
+                new NetAddress("111.230.183.28", 8000),
+                new NetAddress("111.230.197.199", 8000)};
+//        NetAddress[] prefix = {new NetAddress("172.16.0.6", 8000),
+//                new NetAddress("172.16.0.4", 8000),
+//                new NetAddress("172.16.0.5", 8000),
+//                new NetAddress("172.16.0.10", 8000)};
+        NetAddress[] prefix = nodes;
         int nodesCount = nodes.length;
         int mongoPort = 27017;
         String username = "blockchain";
@@ -132,28 +147,32 @@ public class RunUtil {
 
         List<String> result = new ArrayList<String>();
 
-        for(int i = 0; i < nodesCount; i++) {
-            config = new MongoDBConfig(nodes[i].getIp(), mongoPort, username, password, database);
-            mongoDB = new MongoDB(config);
+        while (true) {
+            for (int i = 0; i < nodesCount; i++) {
+                config = new MongoDBConfig(nodes[i].getIp(), mongoPort, username, password, database);
+                mongoDB = new MongoDB(config);
 
-            pmCollection = prefix[i].toString() + "." + Const.PM;
-            cmtmCollection = prefix[i].toString() + "." + Const.CMTM;
-            txCollection = prefix[i].toString() + "." + Const.TX;
+                pmCollection = prefix[i].toString() + "." + Const.PM;
+                cmtmCollection = prefix[i].toString() + "." + Const.CMTM;
+                txCollection = prefix[i].toString() + "." + Const.TX;
 
-            long pmCount = mongoDB.countRecords(pmCollection);
-            long cmtmCount = mongoDB.countRecords(cmtmCollection);
-            long txCount = mongoDB.countRecords(txCollection);
+                long pmCount = mongoDB.countRecords(pmCollection);
+                long cmtmCount = mongoDB.countRecords(cmtmCollection);
+                long txCount = mongoDB.countRecords(txCollection);
 
-            result.add("主机 [ " + nodes[i].toString() + " ] < "
-                    + "prepare msg: " + pmCount
-                    + ", commit msg: " + cmtmCount
-                    + ", tx count: " + txCount);
-        }
+                result.add(df.format(new Date()) + " --> 主机 [ " + nodes[i].toString() + " ] < "
+                        + "prepare msg: " + pmCount
+                        + ", commit msg: " + cmtmCount
+                        + ", tx count: " + txCount);
+            }
 
-        result.add("=================================================================================");
+            result.add("=================================================================================");
 
-        for (String res : result) {
-            System.out.println(res);
+            for (String res : result) {
+                System.out.println(res);
+            }
+
+            Thread.sleep(500);
         }
 
     }
@@ -191,10 +210,10 @@ public class RunUtil {
     @Test
     public void generateConfigFile() {
 
-        NetAddress validator1 = new NetAddress("172.16.0.6", 8000);
-        NetAddress validator2 = new NetAddress("172.16.0.5", 8000);
-        NetAddress validator3 = new NetAddress("172.16.0.10", 8000);
-        NetAddress validator4 = new NetAddress("172.16.0.4", 8000);
+        NetAddress validator1 = new NetAddress("193.112.198.57", 8000);
+        NetAddress validator2 = new NetAddress("193.112.186.91", 8000);
+        NetAddress validator3 = new NetAddress("111.230.183.28", 8000);
+        NetAddress validator4 = new NetAddress("111.230.197.199", 8000);
 
         int validatorCount = 4;
 
@@ -305,7 +324,27 @@ public class RunUtil {
      */
     @Test
     public void clearDB() {
-        MongoDB mongoDB = new MongoDB(mongoDBConfig);
-        mongoDB.deleteAllCollections();
+        NetAddress[] nodes = {new NetAddress("127.0.0.1", 8000),
+                new NetAddress("193.112.186.91", 8000),
+                new NetAddress("111.230.183.28", 8000),
+                new NetAddress("111.230.197.199", 8000)};
+        int nodesCount = nodes.length;
+        int mongoPort = 27017;
+        String username = "blockchain";
+        String password = "zc-12332145";
+        String database = "BlockChain";
+        MongoDBConfig mongoDBConfig = null;
+        MongoDB mongoDB = null;
+        for (int i = 0; i < nodesCount; i++) {
+            mongoDBConfig = new MongoDBConfig(nodes[i].getIp(), mongoPort, username, password, database);
+            mongoDB = new MongoDB(mongoDBConfig);
+            mongoDB.deleteAllCollections();
+        }
+    }
+
+    @Test
+    public void split() {
+        String str = "{\"msgId\":\"KQDaXx4c9CEJ4UPuyfvu589lTQwPtzz0/wzmdURHPKw=\",\"msgType\":\"CommitMsg\",\"timestamp\":\"1549962482980\",\"pubKey\":\"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE5w13lRiN+JqTnDbbZR76bs/p/JoMyS1puMRiLzQGCokR9B9OBh/7+1mtSoQ1d1wMAYDfLotETYR4npFzovUFYQ==\",\"signature\":\"MEUCIQDxbXCBNkqlHiXUpJ5Zuv/x0BoNeGfCwvSpgiqtqVBekQIgQ2VnNNEFCeLsg/XpvpssP7BiPYbfPc663buTf+pBxac=\",\"prepareMessageId\":\"iPul8GyBpRSaLHPtI7pBprIHSBXNvFyc2C9J7jkkkeE=\",\"clientMsgId\":\"yGZnXsWQfgprPxUTN6K75AbgjwLZ2T3tSXAPc/vB8cc=\",\"ip\":\"111.230.197.199\",\"port\":8000}";
+        System.out.println(str.split("\"")[3]);
     }
 }

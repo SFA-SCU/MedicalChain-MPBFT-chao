@@ -53,7 +53,7 @@ public class CommitMessageService {
 
         // 1. 校验接收到的 CommitMessage
         CommitMessage commitMessage = objectMapper.readValue(receivedMessage, CommitMessage.class);
-        logger.info("接收到 CommitMsg：" + receivedMessage);
+        logger.info("接收到 CommitMsg：" + commitMessage.getMsgId());
         logger.debug("开始校验 CommitMsg ...");
         boolean verifyResult = this.verify(commitMessage);
         logger.debug("校验结束，结果为：" + verifyResult);
@@ -198,7 +198,8 @@ public class CommitMessageService {
                             List<Transaction> txList = txMessage.getTxList();
                             if (txService.saveBatch(txList, txCollection)) {
                                 List<String> txIdList = txService.getTxIdList(txList);
-                                logger.info("交易 :" + txIdList + " 存入成功");
+//                                logger.info("交易 :" + txIdList + " 存入成功");
+                                logger.info("交易 :" + txIdList.get(0) + " 等存入成功");
 
                                 //TODO 验证成功的 tx 发送到 blocker 服务器上
 //                                TxIdMessage txIdMsg = timSrv.genInstance(txIdList, netAddress.getIp(), netAddress.getPort());

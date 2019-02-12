@@ -104,8 +104,9 @@ public class RabbitmqUtil {
         try {
             Connection conn = factory.newConnection();
             Channel channel = conn.createChannel();
+            channel.queueDeclare(this.queueName, false, false, false, null);
+//            channel.basicPublish("", this.queueName, null, messages.getBytes("UTF-8"));
             for (String message : messages) {
-                channel.queueDeclare(this.queueName, false, false, false, null);
                 channel.basicPublish("", this.queueName, null, message.getBytes("UTF-8"));
                 logger.debug(" [x] Sent '" + message + "'");
             }

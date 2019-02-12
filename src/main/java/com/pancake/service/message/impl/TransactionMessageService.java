@@ -7,7 +7,7 @@ import com.pancake.entity.message.PrepareMessage;
 import com.pancake.entity.message.TransactionMessage;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
-import com.pancake.service.component.NewNetService;
+import com.pancake.service.component.NetService;
 import com.pancake.util.MongoUtil;
 import com.pancake.util.RabbitmqUtil;
 import com.pancake.util.SignatureUtil;
@@ -27,7 +27,7 @@ public class TransactionMessageService {
     private final static Logger logger = LoggerFactory.getLogger(TransactionMessageService.class);
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private TransactionDao txDao = TransactionDao.getInstance();
-    private NewNetService netService = NewNetService.getInstance();
+    private NetService netService = NetService.getInstance();
     private PrepareMessageService prepareMessageService = PrepareMessageService.getInstance();
 
     private static class LazyHolder {
