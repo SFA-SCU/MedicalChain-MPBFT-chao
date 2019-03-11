@@ -38,7 +38,7 @@
             <!-- log.dir 在maven profile里配置 -->
             <fileNamePattern>log/debug-%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- 日志最大的历史 60天 -->
-            <maxHistory>60</maxHistory>
+            <maxHistory>1</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>%date{yyyy-MM-dd HH:mm:ss} | %-5level | %thread | %logger | %msg%n</pattern>
@@ -56,7 +56,7 @@
             <!-- log.dir 在maven profile里配置 -->
             <fileNamePattern>log/error-%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- 日志最大的历史 60天 -->
-            <maxHistory>60</maxHistory>
+            <maxHistory>1</maxHistory>
         </rollingPolicy>
         <encoder>
             <Pattern>
@@ -65,6 +65,25 @@
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印DEBUG日志 -->
             <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <!-- INFO appender  -->
+    <!-- DEBUG appender  -->
+    <appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 按天回滚 daily -->
+            <!-- log.dir 在maven profile里配置 -->
+            <fileNamePattern>log/info-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 日志最大的历史 1天 -->
+            <maxHistory>1</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss} | %-5level | %thread | %logger | %msg%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印DEBUG日志 -->
+            <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
@@ -127,6 +146,7 @@
     <root level="DEBUG">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="DEBUG" />
+        <appender-ref ref="INFO" />
         <appender-ref ref="ERROR" />
         <appender-ref ref="WARN" />
         <appender-ref ref="STDOUT_ERROR" />

@@ -36,7 +36,11 @@ public class RabbitmqUtil {
 //    }
 
     public RabbitmqUtil(String queueName) {
-        this.init(queueName, null);
+        this.init(queueName, "");
+    }
+
+    public RabbitmqUtil(String queueName, RabbitmqServer rabbitmqServer) {
+        this.init(queueName, rabbitmqServer);
     }
 
     public RabbitmqUtil(String queueName, String blockChainConfigFile) {
@@ -45,11 +49,15 @@ public class RabbitmqUtil {
 
     public void init(String queueName, String blockChainConfigFile) {
         RabbitmqServer rabbitmqServer = null;
-        if (blockChainConfigFile == null) {
+        if (blockChainConfigFile == null || blockChainConfigFile.equals("")) {
             rabbitmqServer = JsonUtil.getRabbitmqServer(Const.BlockChainConfigFile);
         } else {
             rabbitmqServer = JsonUtil.getRabbitmqServer(blockChainConfigFile);
         }
+        init(queueName, rabbitmqServer);
+    }
+
+    public void init(String queueName, RabbitmqServer rabbitmqServer) {
         factory.setUsername(rabbitmqServer.getUserName());
         factory.setPassword(rabbitmqServer.getPassword());
 //        factory.setVirtualHost(virtualHost);
@@ -186,6 +194,10 @@ public class RabbitmqUtil {
             logger.debug("接收结束");
             channel.close();
             conn.close();
+            double size = totalLen / Math.pow(1024, 2);
+            long timeUsage = (System.nanoTime() - beginTime) / 1000000;
+            logger.info("获取待处理消息总大小为 [" + size + "] MB, 耗费时间为 [" + timeUsage + "], 处理速度为 ["
+                    + size / timeUsage + "] MB/ms");
         } catch (TimeoutException e) {
             e.printStackTrace();
         } catch (IOException e) {

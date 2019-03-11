@@ -2,10 +2,12 @@ package com.pancake.util;
 
 import com.mongodb.*;
 import com.mongodb.client.*;
+import com.mongodb.client.model.Filters;
 import com.pancake.entity.pojo.MongoDBConfig;
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -249,6 +251,26 @@ public class MongoDB {
         for (String s : mongoDatabase.listCollectionNames()) {
             mongoDatabase.getCollection(s).drop();
         }
+    }
+
+    /**
+     * 获取满足 key1 = value1, key2 >= value2 的所有记录
+     * @param key1
+     * @param value1
+     * @param key2
+     * @param value2
+     * @param collectionName
+     * @return
+     */
+    public List<String> find(String key1, boolean value1, String key2, int value2, String collectionName) {
+        List<String> result = new ArrayList<String>();
+        MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+        Bson condition = Filters.and(Filters.eq(key1, value1), Filters.gte(key2, value2));
+        FindIterable<Document> documents = collection.find(condition);
+        for (Document document : documents) {
+            result.add(document.toJson());
+        }
+        return result;
     }
 
 }

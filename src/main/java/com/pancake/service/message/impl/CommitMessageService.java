@@ -53,7 +53,8 @@ public class CommitMessageService {
 
         // 1. 校验接收到的 CommitMessage
         CommitMessage commitMessage = objectMapper.readValue(receivedMessage, CommitMessage.class);
-        logger.info("接收到 CommitMsg：" + commitMessage.getMsgId());
+        logger.info("接收到来自" + commitMessage.getIp() + ":" + commitMessage.getPort() +
+                "CommitMsg：" + commitMessage.getMsgId());
         logger.debug("开始校验 CommitMsg ...");
         boolean verifyResult = this.verify(commitMessage);
         logger.debug("校验结束，结果为：" + verifyResult);
@@ -65,7 +66,8 @@ public class CommitMessageService {
 
             PrepareMessage prepareMessage = MongoUtil.findPrepareMessageById(commitMessage.getPrepareMessageId(),
                     prepareMessageCollection);
-            if (prepareMessage != null) {
+
+//            if (prepareMessage != null) {
 //                // 1. 统计 PrepareMessageId 出现的次数
 ////                int count = MongoUtil.countPPMSign(commitMessage.getPrepareMessageId(), commitMessageCollection);
 //                int count = MongoUtil.countPrepareMessageId(commitMessage.getPrepareMessageId(), commitMessageCollection);
@@ -73,7 +75,7 @@ public class CommitMessageService {
 
                 // 1. 将 CommitMessage 存入到集合中
                 if (this.save(commitMessage, commitMessageCollection)) {
-                    logger.debug("将CommitMessage [" + commitMessage.getMsgId() + "] 存入数据库");
+                    logger.info("将CommitMessage [" + commitMessage.getMsgId() + "] 存入数据库");
                     // 2. 更新某交易单所对应的来自不同节点的 commit message 的个数
                     String clientMsgId = commitMessage.getClientMsgId();
 //                    boolean result = this.updateCommitMessageQuantity(clientMsgId, url);
@@ -81,7 +83,7 @@ public class CommitMessageService {
                     if (result) {
                         logger.debug("更新 " + clientMsgId + "数量成功");
                     } else {
-                        logger.debug("更新 " + clientMsgId + "数量失败");
+                        logger.error("更新 " + clientMsgId + "数量失败");
                     }
 
                 } else {
@@ -96,7 +98,7 @@ public class CommitMessageService {
 //                    cmtdmService.procCMTDM(cmtdm, clientMessage, validatorAddr);
 //                }
                 //TODO
-            }
+//            }
         }
 
     }
@@ -140,6 +142,7 @@ public class CommitMessageService {
                 return true;
             }
         }
+
     }
 
     /**

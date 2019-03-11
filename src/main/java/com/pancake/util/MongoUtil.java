@@ -337,6 +337,26 @@ public class MongoUtil {
     }
 
     /**
+     * 获取满足 key1 = value1, key2 >= value2 的所有记录
+     * @param key1
+     * @param value1
+     * @param key2
+     * @param value2
+     * @param collectionName
+     * @return
+     */
+    public static List<String> find(String key1, boolean value1, String key2, int value2, String collectionName) {
+        List<String> result = new ArrayList<String>();
+        MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
+        Bson condition = Filters.and(Filters.eq(key1, value1), Filters.gte(key2, value2));
+        FindIterable<Document> documents = collection.find(condition);
+        for (Document document : documents) {
+            result.add(document.toJson());
+        }
+        return result;
+    }
+
+    /**
      * 获取满足 key = value 的文档
      * @param key
      * @param value

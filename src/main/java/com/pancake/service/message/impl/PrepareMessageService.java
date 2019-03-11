@@ -74,7 +74,7 @@ public class PrepareMessageService {
     @SuppressWarnings("Duplicates")
     public boolean save(PrepareMessage prepareMessage, String collectionName) {
         // TODO
-        synchronized (this) {
+//        synchronized (this) {
             if (MongoUtil.findByKV("msgId", prepareMessage.getMsgId(), collectionName)) {
                 logger.error("prepareMessage: [" + prepareMessage.getMsgId() + "] 已存在");
                 return false;
@@ -82,7 +82,7 @@ public class PrepareMessageService {
                 MongoUtil.insertJson(prepareMessage.toString(), collectionName);
                 return true;
             }
-        }
+//        }
     }
 
     public boolean save(String prepareMessageStr, String collectionName) {

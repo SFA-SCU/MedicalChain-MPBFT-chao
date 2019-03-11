@@ -2,6 +2,7 @@ package com.pancake.socket;
 
 import com.pancake.entity.util.Const;
 import com.pancake.entity.util.NetAddress;
+import com.pancake.handler.CommitHandler;
 import com.pancake.handler.ValidatorHandler;
 import com.pancake.util.JsonUtil;
 import org.slf4j.Logger;
@@ -48,6 +49,9 @@ public class ValidatorServer implements Runnable {
             String ip = validatorAddr.getIp();
             logger.info("Validator [" + ip + ":"
                     + serverSocket.getLocalPort() + "] 启动");
+            logger.info("服务器 [" + ip + ":"
+                    + serverSocket.getLocalPort() + "] 启动检测生成 CommittedMessage 服务器");
+            new Thread(new CommitHandler(validatorAddr)).start();
 
             Socket socket = null;
             while (true) {
