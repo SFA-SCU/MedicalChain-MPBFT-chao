@@ -66,7 +66,7 @@ public class CommittedMessageService {
         NetAddress blockerAddr = new NetAddress(netAddress.getIp(), netAddress.getPort() + 1000);
 
         if (this.save(cmtdMsg, cmtdMsgCollection)) {
-            logger.info("将 CommittedMessage [" + cmtdMsg.toString() + "] 存入数据库");
+            logger.info("将 CommittedMessage [" + cmtdMsg.getMsgId() + "] 存入数据库");
 
             if (cliMsgType.equals(BlockMessage.class.getSimpleName())) {
                 // 如果 clientMessage 引用的对象为 BlockMessage 类型
@@ -95,7 +95,8 @@ public class CommittedMessageService {
                 List<Transaction> txList = txMessage.getTxList();
                 if (txService.saveBatch(txList, txCollection)) {
                     List<String> txIdList = txService.getTxIdList(txList);
-                    logger.info("交易 :" + txIdList + " 存入成功");
+//                    logger.info("交易 :" + txIdList + " 存入成功");
+                    logger.info("交易存入成功");
 
                     // 验证成功的 tx 发送到 blocker 服务器上
                     TxIdMessage txIdMsg = timSrv.genInstance(txIdList, netAddress.getIp(), netAddress.getPort());

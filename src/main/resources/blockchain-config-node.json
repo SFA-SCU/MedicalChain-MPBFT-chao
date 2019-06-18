@@ -56,7 +56,7 @@
 
   "rabbitmq": {
     "userName": "admin",
-    "password": "admin",
+    "password": "zc-12332145",
     "ip": "127.0.0.1",
     "port":5672
   },
@@ -68,8 +68,8 @@
   },
 
   "key_pair": {
-    "pvt_key_file": "C:\\Users\\chao\\privateKey.txt",
-    "pub_key_file": "C:\\Users\\chao\\publicKey.txt"
+    "pvt_key_file": "D:\\chao_blockchain\\MedicalChain-MPBFT\\src\\main\\resources\\privateKey.txt",
+    "pub_key_file": "D:\\chao_blockchain\\MedicalChain-MPBFT\\src\\main\\resources\\publicKey.txt"
   },
 
   "block": {

@@ -49,12 +49,12 @@ public class RunUtil {
 //        RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_QUEUE);
         TransactionService txService = TransactionService.getInstance();
         RabbitmqServer rabbitmqServer =
-                new RabbitmqServer("admin", "zc-12332145", "111.230.200.49", 5672);
+                new RabbitmqServer("admin", "zc-12332145", "127.0.0.1", 5672);
         RabbitmqUtil rmq = new RabbitmqUtil(Const.TX_QUEUE, rabbitmqServer);
         List<String> txList = new ArrayList<String>();
         try {
             long startTime = System.currentTimeMillis();
-            int textTxCount = 10000;
+            int textTxCount = 1000;
             for (int i = 0; i < textTxCount; i++) {
                 Transaction tx = txService.genTx(TxType.INSERT.getName(), new TxString("测试" + i));
                 txList.add(tx.toString());
@@ -186,6 +186,59 @@ public class RunUtil {
 
     }
 
+    /**
+     * 统计远程主机上交易单与区块的个数
+     */
+    @Test
+    public void countRemoteTxAndBlocks() throws InterruptedException {
+//        NetAddress[] nodes = {new NetAddress("111.230.209.236", 8000),
+//                new NetAddress("118.126.89.41", 8000),
+//                new NetAddress("193.112.204.149", 8000),
+//                new NetAddress("129.204.128.234", 8000)};
+        NetAddress[] nodes = getNodes();
+//        NetAddress[] prefix = {new NetAddress("172.16.0.6", 8000),
+//                new NetAddress("172.16.0.4", 8000),
+//                new NetAddress("172.16.0.5", 8000),
+//                new NetAddress("172.16.0.10", 8000)};
+        NetAddress[] prefix = nodes;
+        int nodesCount = nodes.length;
+        int mongoPort = 27017;
+        String username = "blockchain";
+        String password = "zc-12332145";
+        String database = "BlockChain";
+        String txCollection;
+        String blockChainCollection;
+        MongoDBConfig config;
+        MongoDB mongoDB;
+
+        List<String> result = new ArrayList<String>();
+
+        while (true) {
+            for (int i = 0; i < nodesCount; i++) {
+                config = new MongoDBConfig(nodes[i].getIp(), mongoPort, username, password, database);
+                mongoDB = new MongoDB(config);
+
+                txCollection = prefix[i].toString() + "." + Const.TX;
+                blockChainCollection = prefix[i].getIp() + ":" + prefix[i].getPort() + "." + Const.BLOCK_CHAIN;
+
+                long txCount = mongoDB.countRecords(txCollection);
+                long blocksCount = mongoDB.countRecords(blockChainCollection);
+
+                result.add(df.format(new Date()) + " --> 节点 [ " + prefix[i] + " ] < "
+                        + "交易单数量: " + txCount
+                        + ", 区块数量: " + blocksCount);
+            }
+
+            result.add("=================================================================================");
+
+            for (String res : result) {
+                System.out.println(res);
+            }
+
+            Thread.sleep(2000);
+        }
+
+    }
     @Test
     public void compare() {
         MongoUtil.compare2Collection("127.0.0.1:8001.CommitMsg", "127.0.0.1:8002.CommitMsg");
@@ -324,8 +377,8 @@ public class RunUtil {
 
     @Test
     public void time() {
-        String[] time1 = "22:41:54:4154".split(":");
-        String[] time2  = "22:45:01:451".split(":");
+            String[] time1 = "16:12:46:1246".split(":");
+        String[] time2  = "16:12:55:1255".split(":");
         int minute;
         int sec;
         int millsec;
@@ -344,10 +397,18 @@ public class RunUtil {
     }
 
     public NetAddress[] getNodes() {
-        NetAddress[] nodes = {new NetAddress("111.230.200.49", 8000),
-                new NetAddress("193.112.250.122", 8000),
-                new NetAddress("193.112.201.81", 8000),
-                new NetAddress("134.175.208.12", 8000)};
+//        NetAddress[] nodes = {new NetAddress("111.230.200.49", 8000),
+//                new NetAddress("193.112.250.122", 8000),
+//                new NetAddress("193.112.201.81", 8000),
+//                new NetAddress("134.175.208.12", 8000)};
+        NetAddress[] nodes = {new NetAddress("127.0.0.1", 8000),
+                new NetAddress("127.0.0.1", 8001),
+                new NetAddress("127.0.0.1", 8002),
+                new NetAddress("127.0.0.1", 8003)};
+//        NetAddress[] nodes = {new NetAddress("192.168.12.128", 8000),
+//                new NetAddress("192.168.12.129", 8000),
+//                new NetAddress("192.168.12.130", 8000),
+//                new NetAddress("192.168.12.131", 8000)};
         return nodes;
     }
 }

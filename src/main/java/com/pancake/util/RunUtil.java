@@ -44,7 +44,8 @@ public class RunUtil {
         txIdList.add(txId);
         Block block = blockService.genBlock(Const.GENESIS_BLOCK_ID, txIdList);
         System.out.println("block: " + block);
-        blocker.sendBlock(block, NetUtil.getPrimaryNode());
+//        blocker.sendBlock(block, NetUtil.getPrimaryNode());
+        blocker.sendBlock(block, new NetAddress("192.168.12.128", 8000));
     }
     /**
      * 统计各个集合中记录的数量

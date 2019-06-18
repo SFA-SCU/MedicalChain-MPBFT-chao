@@ -40,7 +40,7 @@ public class Blocker implements Runnable {
     public Blocker() {
 //        this.timeInterval = 5000;
 //        this.blockSize = Const.TX_ID_LIST_SIZE;
-        this.init();
+//        this.init();
         this.timeout = 5000;
     }
 
